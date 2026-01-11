@@ -66,7 +66,7 @@ function validateHoldingsWeight(holdings: UpdatePortfolioInput['holdings']): voi
     return;
   }
 
-  const sum = holdings.reduce((acc: number, h) => acc + h.targetWeight, 0);
+  const sum = holdings.reduce((acc: number, h: { targetWeight: number }) => acc + h.targetWeight, 0);
   if (Math.abs(sum - 1.0) > EPSILON) {
     throw new Error(`Holdings weights must sum to 1.0, got ${sum.toFixed(4)}`);
   }
