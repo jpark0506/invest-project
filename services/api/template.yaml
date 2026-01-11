@@ -1,0 +1,356 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: invest-assist API
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 30
+    MemorySize: 256
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        NODE_ENV: !Ref Environment
+        DYNAMODB_USERS_TABLE: !Ref UsersTable
+        DYNAMODB_PORTFOLIOS_TABLE: !Ref PortfoliosTable
+        DYNAMODB_PLANS_TABLE: !Ref PlansTable
+        DYNAMODB_EXECUTIONS_TABLE: !Ref ExecutionsTable
+        DYNAMODB_AUTH_TOKENS_TABLE: !Ref AuthTokensTable
+        DYNAMODB_REFRESH_TOKENS_TABLE: !Ref RefreshTokensTable
+        DYNAMODB_NOTIFICATION_LOGS_TABLE: !Ref NotificationLogsTable
+        JWT_SECRET_ARN: !Ref JwtSecretArn
+        SES_FROM_EMAIL: !Ref SesFromEmail
+        APP_URL: !Ref AppUrl
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+  JwtSecretArn:
+    Type: String
+    Description: ARN of the JWT secret in Secrets Manager
+  SesFromEmail:
+    Type: String
+    Description: Verified SES email address for sending notifications
+  AppUrl:
+    Type: String
+    Description: Frontend application URL
+    Default: http://localhost:5173
+
+Resources:
+  # ========== API Gateway ==========
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: !Sub "'${AppUrl}'"
+        AllowCredentials: true
+
+  # ========== Auth Functions ==========
+  AuthStartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/auth/handlers/start.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/start
+            Method: POST
+
+  AuthVerifyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/auth/handlers/verify.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/verify
+            Method: POST
+
+  AuthRefreshFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/auth/handlers/refresh.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/refresh
+            Method: POST
+
+  AuthLogoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/auth/handlers/logout.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/logout
+            Method: POST
+
+  # ========== User Functions ==========
+  MeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/user/handlers/me.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /me
+            Method: GET
+
+  # ========== Portfolio Functions ==========
+  GetPortfolioFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/portfolio/handlers/get.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /portfolio
+            Method: GET
+
+  PutPortfolioFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/portfolio/handlers/put.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /portfolio
+            Method: PUT
+
+  # ========== Plan Functions ==========
+  GetPlanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/plan/handlers/get.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /plan
+            Method: GET
+
+  PutPlanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/plan/handlers/put.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /plan
+            Method: PUT
+
+  # ========== Execution Functions ==========
+  GetExecutionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/execution/handlers/list.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /executions
+            Method: GET
+
+  GetExecutionDetailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/execution/handlers/detail.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /executions/{ymCycle}
+            Method: GET
+
+  ConfirmExecutionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/execution/handlers/confirm.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /executions/{ymCycle}/confirm
+            Method: POST
+
+  # ========== Scheduler Function ==========
+  SchedulerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/modules/scheduler/handlers/run.handler
+      Timeout: 300
+      MemorySize: 512
+      Events:
+        ScheduleRule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 0 * * ? *)  # 9:00 AM KST (UTC+9)
+            Description: Daily scheduler for execution generation
+            Enabled: true
+
+  # ========== DynamoDB Tables ==========
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-users-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: emailIndex
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  PortfoliosTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-portfolios-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: portfolioId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: portfolioId
+          KeyType: RANGE
+
+  PlansTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-plans-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: planId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: planId
+          KeyType: RANGE
+
+  ExecutionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-executions-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: ymCycle
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: ymCycle
+          KeyType: RANGE
+
+  AuthTokensTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-auth-tokens-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tokenHash
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tokenHash
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  RefreshTokensTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-refresh-tokens-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tokenId
+          AttributeType: S
+        - AttributeName: tokenHash
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tokenId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: tokenHashIndex
+          KeySchema:
+            - AttributeName: tokenHash
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: userIdIndex
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  NotificationLogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-notification-logs-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: sentAtType
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: sentAtType
+          KeyType: RANGE
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}

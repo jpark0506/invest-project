@@ -1,0 +1,31 @@
+{
+  "name": "@invest-assist/api",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Backend API for invest-assist (Lambda + API Gateway)",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist .aws-sam"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.490.0",
+    "@aws-sdk/lib-dynamodb": "^3.490.0",
+    "@aws-sdk/client-ses": "^3.490.0",
+    "@aws-sdk/client-secrets-manager": "^3.490.0",
+    "@invest-assist/core": "workspace:*",
+    "jose": "^5.2.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  }
+}
