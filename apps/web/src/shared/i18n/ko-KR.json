@@ -29,10 +29,22 @@
     "noExecutions": "이번 달 주문표가 없습니다",
     "cycle": "{{index}}차",
     "budget": "예산",
+    "viewReport": "보고서",
     "status": {
       "GENERATED": "생성됨",
       "SENT": "발송됨",
       "CONFIRMED": "확인됨"
+    },
+    "stats": {
+      "totalInvested": "총 투자금액",
+      "executions": "실행 현황"
+    },
+    "report": {
+      "title": "투자 보고서",
+      "summary": "요약",
+      "confirmed": "완료된 주문",
+      "pending": "대기 중인 주문",
+      "monthly": "월별 현황"
     }
   },
   "execution": {

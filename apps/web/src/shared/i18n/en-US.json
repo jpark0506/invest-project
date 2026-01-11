@@ -29,10 +29,22 @@
     "noExecutions": "No order sheets this month",
     "cycle": "Cycle {{index}}",
     "budget": "Budget",
+    "viewReport": "Report",
     "status": {
       "GENERATED": "Generated",
       "SENT": "Sent",
       "CONFIRMED": "Confirmed"
+    },
+    "stats": {
+      "totalInvested": "Total Invested",
+      "executions": "Executions"
+    },
+    "report": {
+      "title": "Investment Report",
+      "summary": "Summary",
+      "confirmed": "Completed Orders",
+      "pending": "Pending Orders",
+      "monthly": "Monthly Breakdown"
     }
   },
   "execution": {
