@@ -39,9 +39,6 @@ function getCorsHeaders(origin?: string): Record<string, string> {
   };
 }
 
-// Default headers for backwards compatibility
-const corsHeaders = getCorsHeaders();
-
 /**
  * Extract origin from API Gateway event
  */
