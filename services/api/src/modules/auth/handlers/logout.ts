@@ -10,7 +10,7 @@ import { getOrigin } from '../../../shared/response';
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
-  'https://invest-project-web.vercel.app',
+  'https://invest-project-orpin.vercel.app',
 ];
 
 export const handler: APIGatewayProxyHandler = async (event) => {

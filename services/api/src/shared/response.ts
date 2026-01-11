@@ -16,7 +16,7 @@ interface ErrorBody {
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
-  'https://invest-project-web.vercel.app',
+  'https://invest-project-orpin.vercel.app',
 ];
 
 // Add APP_URL from config if not already in list

@@ -13,7 +13,7 @@ const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60; // 14 days in seconds
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
-  'https://invest-project-web.vercel.app',
+  'https://invest-project-orpin.vercel.app',
 ];
 
 export const handler: APIGatewayProxyHandler = async (event) => {
