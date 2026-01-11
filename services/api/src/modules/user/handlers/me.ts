@@ -3,12 +3,14 @@
  */
 
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { success, errors } from '../../../shared/response';
+import { createResponder } from '../../../shared/response';
 import { logger } from '../../../shared/logger';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { getMe } from '../service';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const { success, errors } = createResponder(event);
+
   try {
     const auth = await requireAuth(event);
     const response = await getMe(auth.sub);

@@ -3,13 +3,15 @@
  */
 
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { success, errors } from '../../../shared/response';
+import { createResponder } from '../../../shared/response';
 import { logger } from '../../../shared/logger';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { upsertPlan } from '../service';
 import type { UpdatePlanInput } from '../types';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const { success, errors } = createResponder(event);
+
   try {
     const auth = await requireAuth(event);
     const body: UpdatePlanInput & { email?: string } = event.body ? JSON.parse(event.body) : {};

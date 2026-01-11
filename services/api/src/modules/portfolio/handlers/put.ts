@@ -3,13 +3,15 @@
  */
 
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { success, errors } from '../../../shared/response';
+import { createResponder } from '../../../shared/response';
 import { logger } from '../../../shared/logger';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { upsertPortfolio } from '../service';
 import type { UpdatePortfolioInput } from '../types';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const { success, errors } = createResponder(event);
+
   try {
     const auth = await requireAuth(event);
     const body: UpdatePortfolioInput = event.body ? JSON.parse(event.body) : {};

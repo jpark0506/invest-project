@@ -3,14 +3,24 @@
  */
 
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { successWithCookie, errors } from '../../../shared/response';
+import { createResponder, getOrigin } from '../../../shared/response';
 import { logger } from '../../../shared/logger';
 import { refreshAuth } from '../service';
 import { config } from '../../../shared/config';
 
 const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60; // 14 days in seconds
 
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://invest-project-web.vercel.app',
+];
+
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const { successWithCookie, errors } = createResponder(event);
+  const origin = getOrigin(event);
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
   try {
     // Parse refresh token from cookie
     const cookies = parseCookies(event.headers['Cookie'] || event.headers['cookie'] || '');
@@ -51,6 +61,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         statusCode: 401,
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Access-Control-Allow-Credentials': 'true',
           'Set-Cookie': clearCookie,
         },
         body: JSON.stringify({ error: { code: 'UNAUTHORIZED', message: 'Session expired' } }),

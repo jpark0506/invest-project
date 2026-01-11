@@ -3,7 +3,7 @@
  */
 
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { success, errors } from '../../../shared/response';
+import { createResponder } from '../../../shared/response';
 import { logger } from '../../../shared/logger';
 import { startAuth } from '../service';
 
@@ -12,6 +12,8 @@ interface StartAuthBody {
 }
 
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const { success, errors } = createResponder(event);
+
   try {
     const body: StartAuthBody = event.body ? JSON.parse(event.body) : {};
 

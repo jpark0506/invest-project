@@ -5,8 +5,18 @@
 import type { APIGatewayProxyHandler } from 'aws-lambda';
 import { logger } from '../../../shared/logger';
 import { logout } from '../service';
+import { getOrigin } from '../../../shared/response';
+
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://invest-project-web.vercel.app',
+];
 
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const origin = getOrigin(event);
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
   try {
     // Parse refresh token from cookie
     const cookies = parseCookies(event.headers['Cookie'] || event.headers['cookie'] || '');
@@ -26,6 +36,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Credentials': 'true',
         'Set-Cookie': clearCookie,
       },
       body: JSON.stringify({ ok: true }),
@@ -42,6 +54,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Credentials': 'true',
         'Set-Cookie': clearCookie,
       },
       body: JSON.stringify({ ok: true }),
