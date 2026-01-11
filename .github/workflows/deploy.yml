@@ -56,7 +56,9 @@ jobs:
 
       - name: SAM Build
         working-directory: services/api
-        run: sam build
+        run: |
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          sam build
 
       - name: SAM Deploy
         working-directory: services/api
