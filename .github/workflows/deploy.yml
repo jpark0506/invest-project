@@ -56,7 +56,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build API
-        run: pnpm --filter api build
+        run: pnpm --filter @invest-assist/api build
 
       - name: SAM Build
         run: sam build --template-file services/api/template.yaml
@@ -110,7 +110,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build web
-        run: pnpm --filter web build
+        run: pnpm --filter @invest-assist/web build
         env:
           VITE_API_URL: ${{ secrets.API_URL }}
 

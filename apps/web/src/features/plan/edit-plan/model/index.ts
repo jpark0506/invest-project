@@ -31,11 +31,7 @@ export function usePlanForm(plan: Plan | null) {
       ...prev,
       cycleCount: validCount,
       cycleWeights:
-        validCount === 2
-          ? [50, 50]
-          : validCount === 3
-          ? [40, 30, 30]
-          : prev.cycleWeights,
+        validCount === 2 ? [50, 50] : validCount === 3 ? [40, 30, 30] : prev.cycleWeights,
     }));
   }, []);
 
