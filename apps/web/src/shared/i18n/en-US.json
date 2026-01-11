@@ -1,0 +1,93 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "sendMagicLink": "Send login link",
+    "checkEmail": "Check your email",
+    "magicLinkSent": "We sent a login link to {{email}}",
+    "verifying": "Logging in...",
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Order Sheets",
+    "noExecutions": "No order sheets this month",
+    "cycle": "Cycle {{index}}",
+    "budget": "Budget",
+    "status": {
+      "GENERATED": "Generated",
+      "SENT": "Sent",
+      "CONFIRMED": "Confirmed"
+    }
+  },
+  "execution": {
+    "title": "{{yearMonth}} Cycle {{index}} Order Sheet",
+    "asOfDate": "As of",
+    "cycleBudget": "Cycle Budget",
+    "signal": "Market Signal",
+    "signalLabels": {
+      "COOL": "Oversold",
+      "NEUTRAL": "Neutral",
+      "OVERHEAT": "Overheat"
+    },
+    "signalDisclaimer": "This is a reference signal only. Investment decisions are your responsibility.",
+    "table": {
+      "ticker": "Ticker",
+      "price": "Price",
+      "targetWeight": "Weight",
+      "targetAmount": "Target",
+      "shares": "Shares",
+      "estCost": "Est. Cost",
+      "carryOut": "Carry"
+    },
+    "confirm": "Confirm Order",
+    "confirmTitle": "Confirm Order Completion",
+    "confirmNote": "Note (optional)",
+    "confirmNotePlaceholder": "Add execution details or notes",
+    "confirmed": "Confirmed",
+    "totalEstCost": "Total Est. Cost",
+    "totalCarryOut": "Total Carry"
+  },
+  "settings": {
+    "title": "Settings",
+    "portfolio": {
+      "title": "Portfolio",
+      "name": "Portfolio Name",
+      "holdings": "Holdings",
+      "addHolding": "Add Holding",
+      "ticker": "Ticker",
+      "holdingName": "Name",
+      "weight": "Weight",
+      "weightSum": "Weight Sum"
+    },
+    "plan": {
+      "title": "Investment Plan",
+      "monthlyBudget": "Monthly Budget",
+      "cycleCount": "Cycles",
+      "cycleWeights": "Cycle Weights",
+      "scheduleDays": "Purchase Days",
+      "notifications": "Notifications",
+      "email": "Email"
+    }
+  },
+  "format": {
+    "currency": "{{value}} KRW",
+    "shares": "{{value}} shares",
+    "percent": "{{value}}%"
+  }
+}
