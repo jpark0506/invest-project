@@ -1,0 +1,65 @@
+# Cursor Rules for invest-project
+
+## Language
+- Always respond in Korean
+
+## Pre-commit Checklist (MANDATORY)
+
+Before committing any code changes, ALWAYS run these checks:
+
+1. **TypeScript type check**:
+   ```bash
+   # For API changes
+   cd services/api && pnpm tsc --noEmit
+   
+   # For Web changes  
+   cd apps/web && pnpm tsc --noEmit
+   
+   # For Core changes
+   cd packages/core && pnpm tsc --noEmit
+   ```
+
+2. **Remove unused variables/imports** - TypeScript will fail on unused declarations
+
+3. **Lint check**: `pnpm lint`
+
+## Git Workflow
+
+1. Create feature branch: `git checkout -b <type>/<description>`
+2. Make changes
+3. **RUN TYPE CHECK** ⚠️
+4. Commit with conventional commit message
+5. Merge to main
+6. Push
+
+## API Handler Pattern
+
+Always use `createResponder(event)` for proper CORS handling:
+
+```typescript
+import { createResponder } from '../../../shared/response';
+
+export const handler: APIGatewayProxyHandler = async (event) => {
+  const { success, errors } = createResponder(event);
+  // ... handler logic
+};
+```
+
+## Common Mistakes to Avoid
+
+- ❌ Committing without type check
+- ❌ Leaving unused variables/imports
+- ❌ Manual response objects without CORS headers
+- ❌ Forgetting to update all handlers when changing shared utilities
+
+## Project Structure
+
+- `apps/web` - Vite + React frontend
+- `services/api` - AWS SAM + Lambda API  
+- `packages/core` - Shared business logic
+
+## Deployment
+
+- Push to `main` triggers GitHub Actions
+- API: `services/api/**` changes → SAM deploy
+- Web: `apps/web/**` changes → Vercel auto-deploy
