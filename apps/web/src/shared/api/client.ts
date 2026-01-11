@@ -13,6 +13,8 @@ interface ApiErrorResponse {
 class ApiClient {
   private baseUrl: string;
   private accessToken: string | null = null;
+  private isInitialized = false;
+  private initPromise: Promise<boolean> | null = null;
 
   constructor() {
     this.baseUrl = config.apiBaseUrl;
@@ -24,6 +26,29 @@ class ApiClient {
 
   getAccessToken() {
     return this.accessToken;
+  }
+
+  // Initialize auth state by trying to refresh token (called on app start)
+  async initAuth(): Promise<boolean> {
+    if (this.isInitialized) {
+      return !!this.accessToken;
+    }
+
+    // Avoid multiple init calls
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    this.initPromise = this.tryRefreshToken().finally(() => {
+      this.isInitialized = true;
+      this.initPromise = null;
+    });
+
+    return this.initPromise;
+  }
+
+  isAuthInitialized() {
+    return this.isInitialized;
   }
 
   private async request<T>(
@@ -46,8 +71,8 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      // Try to refresh token on 401
-      if (response.status === 401 && this.accessToken) {
+      // Try to refresh token on 401 (even if accessToken is null, we might have refresh cookie)
+      if (response.status === 401) {
         const refreshed = await this.tryRefreshToken();
         if (refreshed) {
           // Retry the request with new token

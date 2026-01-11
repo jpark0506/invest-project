@@ -4,6 +4,7 @@ import { I18nextProvider } from 'react-i18next';
 import { i18n } from '@/shared/i18n';
 import { ToastContainer } from '@/shared/ui';
 import { AppRoutes } from './routes';
+import { AuthProvider } from './providers/AuthProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,8 +20,10 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
         <BrowserRouter>
-          <AppRoutes />
-          <ToastContainer />
+          <AuthProvider>
+            <AppRoutes />
+            <ToastContainer />
+          </AuthProvider>
         </BrowserRouter>
       </I18nextProvider>
     </QueryClientProvider>
