@@ -9,26 +9,28 @@ interface EditPlanFormProps {
   isLoading: boolean;
   onSubmit: (data: UpdatePlanInput & { email?: string }) => void;
   isPending: boolean;
+  userEmail?: string;
 }
 
-export function EditPlanForm({ plan, isLoading, onSubmit, isPending }: EditPlanFormProps) {
+export function EditPlanForm({ plan, isLoading, onSubmit, isPending, userEmail }: EditPlanFormProps) {
   const { t } = useTranslation();
   const {
     formData,
     updateField,
     updateCycleCount,
     updateCycleWeight,
+    updateScheduleDay,
     reset,
     totalWeight,
     isValid,
     toUpdateInput,
-  } = usePlanForm(plan);
+  } = usePlanForm(plan, userEmail);
 
   useEffect(() => {
     if (plan) {
-      reset(plan);
+      reset(plan, userEmail);
     }
-  }, [plan, reset]);
+  }, [plan, reset, userEmail]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,13 +134,42 @@ export function EditPlanForm({ plan, isLoading, onSubmit, isPending }: EditPlanF
             </div>
           </div>
 
-          {/* Schedule Days */}
-          <Input
-            label={t('settings.plan.scheduleDays')}
-            value={formData.scheduleDays}
-            onChange={(e) => updateField('scheduleDays', e.target.value)}
-            placeholder="5, 19"
-          />
+          {/* Schedule Days - Calendar Style */}
+          <div>
+            <label className="block text-text-secondary text-xs font-medium mb-2">
+              {t('settings.plan.scheduleDays')}
+            </label>
+            <div className="space-y-3">
+              {formData.scheduleDays.map((day, index) => (
+                <div key={index} className="bg-background rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-text-primary">
+                      {index + 1}차 매수일
+                    </span>
+                    <span className="text-sm font-bold text-primary">
+                      {day}일
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => updateScheduleDay(index, d)}
+                        className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
+                          day === d
+                            ? 'bg-primary text-white'
+                            : 'bg-surface text-text-secondary hover:bg-gray-100'
+                        }`}
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Email */}
           <Input

@@ -2,11 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { Layout, toast } from '@/shared/ui';
 import { usePortfolio, useUpdatePortfolio } from '@/entities/portfolio/model';
 import { usePlan, useUpdatePlan } from '@/entities/plan/model';
+import { useUserStore } from '@/entities/user/model';
 import { EditPortfolioForm } from '@/features/portfolio/edit-portfolio/ui';
 import { EditPlanForm } from '@/features/plan/edit-plan/ui';
 
 export function SettingsPage() {
   const { t } = useTranslation();
+  const user = useUserStore((state) => state.user);
 
   const { data: portfolioData, isLoading: isPortfolioLoading } = usePortfolio();
   const { data: planData, isLoading: isPlanLoading } = usePlan();
@@ -61,6 +63,7 @@ export function SettingsPage() {
           isLoading={isPlanLoading}
           onSubmit={handlePlanSubmit}
           isPending={updatePlan.isPending}
+          userEmail={user?.email}
         />
       </section>
     </Layout>

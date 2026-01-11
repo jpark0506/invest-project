@@ -55,8 +55,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     logger.error('Auth refresh failed', { error: message });
 
     if (message.includes('revoked') || message.includes('expired') || message.includes('Invalid')) {
-      // Clear the cookie on failure
-      const clearCookie = 'refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax';
+      // Clear the cookie on failure (cross-origin requires SameSite=None; Secure)
+      const clearCookie = 'refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure';
       return {
         statusCode: 401,
         headers: {
@@ -88,19 +88,17 @@ function parseCookies(cookieHeader: string): Record<string, string> {
   return cookies;
 }
 
-function buildRefreshCookie(tokenId: string, token: string, secure: boolean): string {
+function buildRefreshCookie(tokenId: string, token: string, _secure: boolean): string {
   const value = `${tokenId}:${token}`;
+  // Cross-origin cookies require SameSite=None and Secure
   const parts = [
     `refresh=${value}`,
     'HttpOnly',
     'Path=/',
     `Max-Age=${REFRESH_TOKEN_MAX_AGE}`,
-    'SameSite=Lax',
+    'SameSite=None',
+    'Secure',
   ];
-
-  if (secure) {
-    parts.push('Secure');
-  }
 
   return parts.join('; ');
 }

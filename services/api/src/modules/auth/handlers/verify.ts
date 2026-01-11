@@ -43,19 +43,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   }
 };
 
-function buildRefreshCookie(tokenId: string, token: string, secure: boolean): string {
+function buildRefreshCookie(tokenId: string, token: string, _secure: boolean): string {
   const value = `${tokenId}:${token}`;
+  // Cross-origin cookies require SameSite=None and Secure
   const parts = [
     `refresh=${value}`,
     'HttpOnly',
     'Path=/',
     `Max-Age=${REFRESH_TOKEN_MAX_AGE}`,
-    'SameSite=Lax',
+    'SameSite=None',
+    'Secure',
   ];
-
-  if (secure) {
-    parts.push('Secure');
-  }
 
   return parts.join('; ');
 }

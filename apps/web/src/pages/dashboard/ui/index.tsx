@@ -1,11 +1,20 @@
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Layout, Card } from '@/shared/ui';
+import { Layout, Card, Button } from '@/shared/ui';
 import { useExecutions } from '@/entities/execution/model';
+
+interface StatsData {
+  totalBudget: number;
+  confirmedCount: number;
+  pendingCount: number;
+  monthlyStats: { month: string; budget: number; count: number }[];
+}
 
 export function DashboardPage() {
   const { t } = useTranslation();
   const { data, isLoading, error } = useExecutions();
+  const [showReport, setShowReport] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -31,6 +40,33 @@ export function DashboardPage() {
 
   const executions = data?.executions ?? [];
 
+  // Calculate statistics
+  const stats: StatsData = useMemo(() => {
+    const confirmed = executions.filter((e) => e.status === 'CONFIRMED');
+    const pending = executions.filter((e) => e.status !== 'CONFIRMED');
+
+    // Group by month
+    const monthlyMap = new Map<string, { budget: number; count: number }>();
+    executions.forEach((e) => {
+      const existing = monthlyMap.get(e.yearMonth) || { budget: 0, count: 0 };
+      monthlyMap.set(e.yearMonth, {
+        budget: existing.budget + (e.status === 'CONFIRMED' ? e.cycleBudget : 0),
+        count: existing.count + 1,
+      });
+    });
+
+    const monthlyStats = Array.from(monthlyMap.entries())
+      .map(([month, data]) => ({ month, ...data }))
+      .sort((a, b) => b.month.localeCompare(a.month));
+
+    return {
+      totalBudget: confirmed.reduce((sum, e) => sum + e.cycleBudget, 0),
+      confirmedCount: confirmed.length,
+      pendingCount: pending.length,
+      monthlyStats,
+    };
+  }, [executions]);
+
   if (isLoading) {
     return (
       <Layout>
@@ -53,9 +89,34 @@ export function DashboardPage() {
 
   return (
     <Layout>
-      <h2 className="text-xl font-bold text-text-primary mb-6">
-        {t('dashboard.title')}
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-text-primary">
+          {t('dashboard.title')}
+        </h2>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setShowReport(true)}
+        >
+          {t('dashboard.viewReport')}
+        </Button>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <Card className="text-center">
+          <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.totalInvested')}</p>
+          <p className="text-lg font-bold text-primary">
+            {stats.totalBudget.toLocaleString()}원
+          </p>
+        </Card>
+        <Card className="text-center">
+          <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.executions')}</p>
+          <p className="text-lg font-bold text-text-primary">
+            {stats.confirmedCount}<span className="text-sm text-text-secondary">/{executions.length}</span>
+          </p>
+        </Card>
+      </div>
 
       <div className="space-y-3">
         {executions.map((execution) => (
@@ -98,6 +159,70 @@ export function DashboardPage() {
           </Card>
         )}
       </div>
+
+      {/* Report Modal */}
+      {showReport && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface rounded-2xl w-full max-w-md max-h-[80vh] overflow-auto">
+            <div className="sticky top-0 bg-surface p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-bold">{t('dashboard.report.title')}</h3>
+              <button
+                onClick={() => setShowReport(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 space-y-6">
+              {/* Summary */}
+              <section>
+                <h4 className="text-sm font-semibold text-text-secondary mb-3">
+                  {t('dashboard.report.summary')}
+                </h4>
+                <div className="bg-background rounded-xl p-4 space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">{t('dashboard.stats.totalInvested')}</span>
+                    <span className="font-bold text-primary">{stats.totalBudget.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">{t('dashboard.report.confirmed')}</span>
+                    <span className="font-medium">{stats.confirmedCount}회</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">{t('dashboard.report.pending')}</span>
+                    <span className="font-medium">{stats.pendingCount}회</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Monthly Breakdown */}
+              <section>
+                <h4 className="text-sm font-semibold text-text-secondary mb-3">
+                  {t('dashboard.report.monthly')}
+                </h4>
+                <div className="space-y-2">
+                  {stats.monthlyStats.length > 0 ? (
+                    stats.monthlyStats.map(({ month, budget, count }) => (
+                      <div key={month} className="bg-background rounded-xl p-3 flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">{month}</p>
+                          <p className="text-xs text-text-secondary">{count}회 실행</p>
+                        </div>
+                        <p className="font-bold text-primary">{budget.toLocaleString()}원</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-text-secondary text-center py-4">
+                      {t('dashboard.noExecutions')}
+                    </p>
+                  )}
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

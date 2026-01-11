@@ -5,18 +5,27 @@ export interface PlanFormData {
   monthlyBudget: number;
   cycleCount: number;
   cycleWeights: number[];
-  scheduleDays: string;
+  scheduleDays: number[];
   email: string;
 }
 
-export function usePlanForm(plan: Plan | null) {
-  const [formData, setFormData] = useState<PlanFormData>(() => ({
-    monthlyBudget: plan?.monthlyBudget || 1000000,
-    cycleCount: plan?.cycleCount || 2,
-    cycleWeights: plan?.cycleWeights?.map((w) => w * 100) || [50, 50],
-    scheduleDays: plan?.schedule?.days?.join(', ') || '5, 19',
-    email: plan?.email || '',
-  }));
+// Default schedule days based on cycle count
+const DEFAULT_SCHEDULE_DAYS: Record<number, number[]> = {
+  2: [5, 19],
+  3: [5, 14, 25],
+};
+
+export function usePlanForm(plan: Plan | null, userEmail?: string) {
+  const [formData, setFormData] = useState<PlanFormData>(() => {
+    const cycleCount = plan?.cycleCount || 2;
+    return {
+      monthlyBudget: plan?.monthlyBudget || 1000000,
+      cycleCount,
+      cycleWeights: plan?.cycleWeights?.map((w) => w * 100) || [50, 50],
+      scheduleDays: plan?.schedule?.days || DEFAULT_SCHEDULE_DAYS[cycleCount],
+      email: plan?.email || userEmail || '',
+    };
+  });
 
   const updateField = useCallback(
     <K extends keyof PlanFormData>(field: K, value: PlanFormData[K]) => {
@@ -32,6 +41,7 @@ export function usePlanForm(plan: Plan | null) {
       cycleCount: validCount,
       cycleWeights:
         validCount === 2 ? [50, 50] : validCount === 3 ? [40, 30, 30] : prev.cycleWeights,
+      scheduleDays: DEFAULT_SCHEDULE_DAYS[validCount],
     }));
   }, []);
 
@@ -43,13 +53,14 @@ export function usePlanForm(plan: Plan | null) {
     });
   }, []);
 
-  const reset = useCallback((newPlan: Plan | null) => {
+  const reset = useCallback((newPlan: Plan | null, newUserEmail?: string) => {
+    const cycleCount = newPlan?.cycleCount || 2;
     setFormData({
       monthlyBudget: newPlan?.monthlyBudget || 1000000,
-      cycleCount: newPlan?.cycleCount || 2,
+      cycleCount,
       cycleWeights: newPlan?.cycleWeights?.map((w) => w * 100) || [50, 50],
-      scheduleDays: newPlan?.schedule?.days?.join(', ') || '5, 19',
-      email: newPlan?.email || '',
+      scheduleDays: newPlan?.schedule?.days || DEFAULT_SCHEDULE_DAYS[cycleCount],
+      email: newPlan?.email || newUserEmail || '',
     });
   }, []);
 
@@ -58,23 +69,28 @@ export function usePlanForm(plan: Plan | null) {
     [formData.cycleWeights]
   );
 
-  const parsedDays = useMemo(() => {
-    return formData.scheduleDays
-      .split(',')
-      .map((d) => parseInt(d.trim(), 10))
-      .filter((d) => !isNaN(d) && d >= 1 && d <= 28);
-  }, [formData.scheduleDays]);
+  const updateScheduleDay = useCallback((index: number, day: number) => {
+    setFormData((prev) => {
+      const newDays = [...prev.scheduleDays];
+      newDays[index] = day;
+      return { ...prev, scheduleDays: newDays };
+    });
+  }, []);
 
   const isValid = useMemo(() => {
+    const hasValidEmail = formData.email === '' || formData.email.includes('@');
+    const hasValidDays = formData.scheduleDays.length === formData.cycleCount &&
+      formData.scheduleDays.every((d) => d >= 1 && d <= 28);
+
     return (
       formData.monthlyBudget > 0 &&
       formData.cycleCount >= 2 &&
       formData.cycleCount <= 3 &&
       Math.abs(totalWeight - 100) < 0.01 &&
-      parsedDays.length === formData.cycleCount &&
-      formData.email.includes('@')
+      hasValidDays &&
+      hasValidEmail
     );
-  }, [formData, totalWeight, parsedDays]);
+  }, [formData, totalWeight]);
 
   const toUpdateInput = () => ({
     monthlyBudget: formData.monthlyBudget,
@@ -82,10 +98,10 @@ export function usePlanForm(plan: Plan | null) {
     cycleWeights: formData.cycleWeights.map((w) => w / 100),
     schedule: {
       type: 'MONTHLY_DAYS' as const,
-      days: parsedDays,
+      days: formData.scheduleDays,
       timezone: 'Asia/Seoul',
     } satisfies PlanSchedule,
-    email: formData.email,
+    email: formData.email || undefined,
   });
 
   return {
@@ -93,9 +109,9 @@ export function usePlanForm(plan: Plan | null) {
     updateField,
     updateCycleCount,
     updateCycleWeight,
+    updateScheduleDay,
     reset,
     totalWeight,
-    parsedDays,
     isValid,
     toUpdateInput,
   };
