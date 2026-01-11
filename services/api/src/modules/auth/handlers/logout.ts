@@ -30,7 +30,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     // Clear the cookie
-    const clearCookie = 'refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax';
+    const clearCookie = 'refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure';
 
     return {
       statusCode: 200,
@@ -48,7 +48,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     });
 
     // Still clear the cookie even on error
-    const clearCookie = 'refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax';
+    const clearCookie = 'refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure';
 
     return {
       statusCode: 200,
