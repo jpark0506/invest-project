@@ -91,3 +91,41 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 - `main` 브랜치에 push하면 GitHub Actions가 자동 배포
 - `services/api/**` 변경 → API 배포
 - `apps/web/**` 변경 → Vercel 자동 배포
+- 자세한 배포 가이드: `docs/deployment.md`
+
+## 현재 환경
+
+### Frontend (Vercel)
+- **URL**: https://invest-project-orpin.vercel.app
+- **프로젝트명**: invest-project
+- **Root Directory**: `.` (프로젝트 루트)
+
+### Backend (AWS)
+- **Prod API**: https://riy8obritg.execute-api.ap-northeast-2.amazonaws.com/prod
+- **Dev API**: https://vtvvcyx2m3.execute-api.ap-northeast-2.amazonaws.com/dev (미사용)
+
+### CORS 허용 Origins
+수정 시 4개 파일 모두 업데이트 필요:
+1. `services/api/src/shared/response.ts` - ALLOWED_ORIGINS
+2. `services/api/template.yaml` - API Gateway CORS
+3. `services/api/src/modules/auth/handlers/refresh.ts`
+4. `services/api/src/modules/auth/handlers/logout.ts`
+
+## 디버깅 명령어
+
+```bash
+# Vercel 프로젝트 연결
+npx vercel link --project invest-project
+
+# Vercel 환경변수 확인
+npx vercel env ls
+
+# Vercel 배포
+npx vercel --prod
+
+# API 타입체크
+cd services/api && pnpm tsc --noEmit
+
+# GitHub Actions 상태 확인
+gh run list --limit 5
+```
