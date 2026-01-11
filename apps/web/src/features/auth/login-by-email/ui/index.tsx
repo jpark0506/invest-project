@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Card } from '@/shared/ui';
+import { authApi } from '../model';
 
 export function LoginPage() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,12 +16,16 @@ export function LoginPage() {
     if (!email) return;
 
     setLoading(true);
+    setError(null);
 
-    // TODO: Call API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setSent(true);
-    setLoading(false);
+    try {
+      await authApi.start(email);
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('common.error'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (sent) {
@@ -52,6 +58,7 @@ export function LoginPage() {
             placeholder={t('auth.emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            error={error || undefined}
             required
           />
 

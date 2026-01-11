@@ -1,29 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Layout, Card } from '@/shared/ui';
-
-// Placeholder data - will be replaced with API call
-const mockExecutions = [
-  {
-    ymCycle: '2026-01#1',
-    yearMonth: '2026-01',
-    cycleIndex: 1,
-    status: 'CONFIRMED',
-    cycleBudget: 500000,
-    signals: { label: 'NEUTRAL' },
-  },
-  {
-    ymCycle: '2026-01#2',
-    yearMonth: '2026-01',
-    cycleIndex: 2,
-    status: 'SENT',
-    cycleBudget: 500000,
-    signals: { label: 'COOL' },
-  },
-];
+import { useExecutions } from '@/entities/execution/model';
 
 export function DashboardPage() {
   const { t } = useTranslation();
+  const { data, isLoading, error } = useExecutions();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -47,6 +29,28 @@ export function DashboardPage() {
     }
   };
 
+  const executions = data?.executions ?? [];
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <Card className="text-center py-12">
+          <p className="text-error">{t('common.error')}</p>
+        </Card>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <h2 className="text-xl font-bold text-text-primary mb-6">
@@ -54,8 +58,8 @@ export function DashboardPage() {
       </h2>
 
       <div className="space-y-3">
-        {mockExecutions.map((execution) => (
-          <Link key={execution.ymCycle} to={`/execution/${execution.ymCycle}`}>
+        {executions.map((execution) => (
+          <Link key={execution.ymCycle} to={`/execution/${encodeURIComponent(execution.ymCycle)}`}>
             <Card className="hover:shadow-elevated transition-shadow">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -88,7 +92,7 @@ export function DashboardPage() {
           </Link>
         ))}
 
-        {mockExecutions.length === 0 && (
+        {executions.length === 0 && (
           <Card className="text-center py-12">
             <p className="text-text-secondary">{t('dashboard.noExecutions')}</p>
           </Card>

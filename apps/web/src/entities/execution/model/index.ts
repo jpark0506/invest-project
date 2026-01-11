@@ -1,0 +1,30 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { executionApi, ConfirmExecutionInput } from '../api';
+
+export function useExecutions(yearMonth?: string) {
+  return useQuery({
+    queryKey: ['executions', yearMonth],
+    queryFn: () => executionApi.list(yearMonth),
+  });
+}
+
+export function useExecutionDetail(ymCycle: string) {
+  return useQuery({
+    queryKey: ['execution', ymCycle],
+    queryFn: () => executionApi.getDetail(ymCycle),
+    enabled: !!ymCycle,
+  });
+}
+
+export function useConfirmExecution() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ ymCycle, data }: { ymCycle: string; data: ConfirmExecutionInput }) =>
+      executionApi.confirm(ymCycle, data),
+    onSuccess: (_, { ymCycle }) => {
+      queryClient.invalidateQueries({ queryKey: ['execution', ymCycle] });
+      queryClient.invalidateQueries({ queryKey: ['executions'] });
+    },
+  });
+}

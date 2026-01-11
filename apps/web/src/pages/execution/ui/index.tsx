@@ -1,53 +1,21 @@
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Layout, Card, Button } from '@/shared/ui';
-
-// Placeholder data - will be replaced with API call
-const mockExecution = {
-  ymCycle: '2026-01#1',
-  yearMonth: '2026-01',
-  cycleIndex: 1,
-  asOfDate: '2026-01-05T09:00:00+09:00',
-  cycleBudget: 500000,
-  signals: { label: 'NEUTRAL', overheatScore: 50 },
-  status: 'SENT',
-  items: [
-    {
-      ticker: '069500',
-      name: 'KODEX 200',
-      price: 35000,
-      targetWeight: 0.5,
-      shares: 7,
-      estCost: 245000,
-      carryOut: 5000,
-    },
-    {
-      ticker: '379800',
-      name: 'KODEX 미국 S&P500 TR',
-      price: 15000,
-      targetWeight: 0.3,
-      shares: 10,
-      estCost: 150000,
-      carryOut: 0,
-    },
-    {
-      ticker: '439870',
-      name: 'TIGER 미국나스닥100',
-      price: 12000,
-      targetWeight: 0.2,
-      shares: 8,
-      estCost: 96000,
-      carryOut: 4000,
-    },
-  ],
-  userConfirm: { confirmedAt: null, note: null },
-};
+import { Layout, Card, Button, Input } from '@/shared/ui';
+import { useExecutionDetail, useConfirmExecution } from '@/entities/execution/model';
 
 export function ExecutionPage() {
   const { ymCycle } = useParams<{ ymCycle: string }>();
+  const navigate = useNavigate();
   const { t } = useTranslation();
+  const [note, setNote] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const execution = mockExecution; // Will be replaced with API call
+  const decodedYmCycle = ymCycle ? decodeURIComponent(ymCycle) : '';
+  const { data, isLoading, error } = useExecutionDetail(decodedYmCycle);
+  const confirmMutation = useConfirmExecution();
+
+  const execution = data?.execution;
 
   const getSignalColor = (label: string) => {
     switch (label) {
@@ -60,13 +28,45 @@ export function ExecutionPage() {
     }
   };
 
+  const handleConfirm = async () => {
+    if (!decodedYmCycle) return;
+
+    try {
+      await confirmMutation.mutateAsync({
+        ymCycle: decodedYmCycle,
+        data: { note: note || undefined },
+      });
+      setShowConfirmModal(false);
+    } catch (error) {
+      // Error handled by mutation
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !execution) {
+    return (
+      <Layout>
+        <Card className="text-center py-12">
+          <p className="text-error">{t('common.error')}</p>
+          <Button variant="secondary" className="mt-4" onClick={() => navigate('/dashboard')}>
+            {t('common.back')}
+          </Button>
+        </Card>
+      </Layout>
+    );
+  }
+
   const totalEstCost = execution.items.reduce((sum, item) => sum + item.estCost, 0);
   const totalCarryOut = execution.items.reduce((sum, item) => sum + item.carryOut, 0);
-
-  const handleConfirm = () => {
-    // TODO: Implement confirm API call
-    alert('주문 완료 확인');
-  };
 
   return (
     <Layout>
@@ -157,7 +157,7 @@ export function ExecutionPage() {
 
       {/* Confirm Button */}
       {execution.status !== 'CONFIRMED' ? (
-        <Button fullWidth onClick={handleConfirm}>
+        <Button fullWidth onClick={() => setShowConfirmModal(true)}>
           {t('execution.confirm')}
         </Button>
       ) : (
@@ -172,6 +172,40 @@ export function ExecutionPage() {
             </svg>
             {t('execution.confirmed')}
           </span>
+          {execution.userConfirm.note && (
+            <p className="text-sm text-text-secondary mt-2">{execution.userConfirm.note}</p>
+          )}
+        </div>
+      )}
+
+      {/* Confirm Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
+          <Card className="w-full max-w-lg rounded-b-none animate-slide-up">
+            <h3 className="text-lg font-bold mb-4">{t('execution.confirmTitle')}</h3>
+            <Input
+              label={t('execution.confirmNote')}
+              placeholder={t('execution.confirmNotePlaceholder')}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+            <div className="flex gap-3 mt-6">
+              <Button
+                variant="secondary"
+                fullWidth
+                onClick={() => setShowConfirmModal(false)}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                fullWidth
+                onClick={handleConfirm}
+                loading={confirmMutation.isPending}
+              >
+                {t('common.confirm')}
+              </Button>
+            </div>
+          </Card>
         </div>
       )}
     </Layout>
