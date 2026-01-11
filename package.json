@@ -1,0 +1,30 @@
+{
+  "name": "invest-assist",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Investment portfolio management and automated order sheet generation",
+  "scripts": {
+    "dev:web": "pnpm --filter @invest-assist/web dev",
+    "dev:api": "pnpm --filter @invest-assist/api dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:core": "pnpm --filter @invest-assist/core test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "prettier": "^3.2.4",
+    "vitest": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.1"
+}
