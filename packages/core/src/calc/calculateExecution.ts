@@ -9,14 +9,14 @@ import {
   CalculateExecutionInput,
   CalculateExecutionOutput,
   ExecutionItem,
-  RoundingPolicy,
 } from './types';
 import { validateInputs } from './validators';
 
-const DEFAULT_ROUNDING_POLICY: RoundingPolicy = {
-  shareRounding: 'FLOOR',
-  currencyRounding: 'NONE',
-};
+// Rounding policy can be used for future customization
+// const DEFAULT_ROUNDING_POLICY: RoundingPolicy = {
+//   shareRounding: 'FLOOR',
+//   currencyRounding: 'NONE',
+// };
 
 /**
  * Calculate execution order sheet for a single cycle
@@ -30,7 +30,8 @@ export function calculateExecution(input: CalculateExecutionInput): CalculateExe
   validateInputs(input);
 
   const { monthlyBudget, cycleWeight, holdings, prices, carryInByTicker } = input;
-  const _roundingPolicy = input.roundingPolicy ?? DEFAULT_ROUNDING_POLICY;
+  // Rounding policy can be used for future customization
+  // const _roundingPolicy = input.roundingPolicy ?? DEFAULT_ROUNDING_POLICY;
 
   // Step 1: Calculate cycle budget
   const cycleBudget = computeCycleBudget(monthlyBudget, cycleWeight);

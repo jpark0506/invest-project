@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Layout, Card, Button, Input } from '@/shared/ui';
 import { useExecutionDetail, useConfirmExecution } from '@/entities/execution/model';
+import type { ExecutionItemRecord } from '@invest-assist/core';
 
 export function ExecutionPage() {
   const { ymCycle } = useParams<{ ymCycle: string }>();
@@ -65,8 +66,8 @@ export function ExecutionPage() {
     );
   }
 
-  const totalEstCost = execution.items.reduce((sum, item) => sum + item.estCost, 0);
-  const totalCarryOut = execution.items.reduce((sum, item) => sum + item.carryOut, 0);
+  const totalEstCost = execution.items.reduce((sum: number, item: ExecutionItemRecord) => sum + item.estCost, 0);
+  const totalCarryOut = execution.items.reduce((sum: number, item: ExecutionItemRecord) => sum + item.carryOut, 0);
 
   return (
     <Layout>
@@ -118,7 +119,7 @@ export function ExecutionPage() {
             </tr>
           </thead>
           <tbody>
-            {execution.items.map((item) => (
+            {execution.items.map((item: ExecutionItemRecord) => (
               <tr key={item.ticker} className="border-b border-border-light">
                 <td className="py-3 px-2">
                   <div className="font-medium">{item.name}</div>
