@@ -38,7 +38,7 @@ async function getJwtSecret(): Promise<Uint8Array> {
 export async function generateAccessToken(payload: JwtPayload): Promise<string> {
   const secret = await getJwtSecret();
 
-  return new jose.SignJWT(payload)
+  return new jose.SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(config.jwtAccessExpiry)

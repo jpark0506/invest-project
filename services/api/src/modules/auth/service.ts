@@ -10,7 +10,7 @@ import { config } from '../../shared/config';
 import { logger } from '../../shared/logger';
 import * as authRepo from './repo';
 import * as userRepo from '../user/repo';
-import type { VerifyAuthResponse, RefreshToken } from './types';
+import type { VerifyAuthResponse } from './types';
 
 const ses = new SESClient({});
 

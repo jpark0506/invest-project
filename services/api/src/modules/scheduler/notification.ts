@@ -7,7 +7,7 @@ import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { docClient } from '../../shared/db';
 import { config } from '../../shared/config';
 import { logger } from '../../shared/logger';
-import type { Execution } from '@invest-assist/core';
+import type { Execution, ExecutionItemRecord } from '@invest-assist/core';
 
 const ses = new SESClient({});
 const notificationLogsTable = config.tables.notificationLogs;
@@ -95,7 +95,7 @@ function buildEmailHtml(execution: Execution): string {
 
   const itemsHtml = execution.items
     .map(
-      (item) => `
+      (item: ExecutionItemRecord) => `
     <tr>
       <td style="padding: 12px; border-bottom: 1px solid #E5E8EB;">${item.name}</td>
       <td style="padding: 12px; border-bottom: 1px solid #E5E8EB; text-align: right;">${item.price.toLocaleString()}원</td>
@@ -158,7 +158,7 @@ function buildEmailHtml(execution: Execution): string {
  */
 function buildEmailText(execution: Execution): string {
   const items = execution.items
-    .map((item) => `  ${item.name}: ${item.shares}주 (${item.estCost.toLocaleString()}원)`)
+    .map((item: ExecutionItemRecord) => `  ${item.name}: ${item.shares}주 (${item.estCost.toLocaleString()}원)`)
     .join('\n');
 
   return `

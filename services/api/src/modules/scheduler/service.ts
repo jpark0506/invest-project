@@ -84,7 +84,7 @@ export async function processPlanForUser(
     }
 
     // Fetch prices
-    const tickers = portfolio.holdings.map((h) => h.ticker);
+    const tickers = portfolio.holdings.map((h: { ticker: string }) => h.ticker);
     const prices = await fetchPrices(tickers);
 
     // Get carry-in from previous cycle
