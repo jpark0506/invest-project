@@ -46,6 +46,7 @@ npx vercel --prod
 ### 3. SPA 라우팅 설정
 
 `apps/web/vercel.json`:
+
 ```json
 {
   "buildCommand": "pnpm build",
@@ -69,6 +70,7 @@ npx vercel --prod
 `main` 브랜치에 push하면 자동으로 배포됩니다.
 
 트리거 조건:
+
 - `services/api/**` 변경
 - `packages/core/**` 변경
 - `.github/workflows/deploy.yml` 변경
@@ -122,11 +124,9 @@ APP_URL=https://invest-project-orpin.vercel.app
 ### 허용된 Origins
 
 `services/api/src/shared/response.ts`:
+
 ```typescript
-const ALLOWED_ORIGINS = [
-  'http://localhost:5173',
-  'https://invest-project-orpin.vercel.app',
-];
+const ALLOWED_ORIGINS = ['http://localhost:5173', 'https://invest-project-orpin.vercel.app'];
 ```
 
 ### URL 변경 시 수정 필요한 파일
