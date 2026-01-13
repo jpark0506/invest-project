@@ -15,3 +15,4 @@ export {
 } from './Loading';
 export { Checkbox } from './Checkbox';
 export { Modal, ConfirmModal } from './Modal';
+export { TickerAutocomplete } from './TickerAutocomplete';

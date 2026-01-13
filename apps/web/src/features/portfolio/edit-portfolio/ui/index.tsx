@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, Input, Button } from '@/shared/ui';
+import { Card, Input, Button, TickerAutocomplete } from '@/shared/ui';
 import { useHoldingsForm, HoldingFormData } from '../model';
 import type { Portfolio, Market } from '@invest-assist/core';
+import type { TickerInfo } from '@/entities/ticker';
 
 interface EditPortfolioFormProps {
   portfolio: Portfolio | null;
@@ -18,6 +19,7 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
     addHolding,
     removeHolding,
     updateHolding,
+    selectTicker,
     resetHoldings,
     totalWeight,
     toPortfolioHoldings,
@@ -79,6 +81,7 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
                   key={holding.id}
                   holding={holding}
                   onUpdate={updateHolding}
+                  onSelectTicker={selectTicker}
                   onRemove={removeHolding}
                 />
               ))}
@@ -125,20 +128,29 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
 interface HoldingRowProps {
   holding: HoldingFormData;
   onUpdate: (id: string, field: keyof HoldingFormData, value: string | number) => void;
+  onSelectTicker: (id: string, ticker: TickerInfo) => void;
   onRemove: (id: string) => void;
 }
 
-function HoldingRow({ holding, onUpdate, onRemove }: HoldingRowProps) {
+function HoldingRow({ holding, onUpdate, onSelectTicker, onRemove }: HoldingRowProps) {
   const { t } = useTranslation();
+
+  const handleTickerSelect = useCallback(
+    (ticker: TickerInfo) => {
+      onSelectTicker(holding.id, ticker);
+    },
+    [holding.id, onSelectTicker]
+  );
 
   return (
     <div className="grid grid-cols-12 gap-2 items-center p-3 bg-background rounded-lg">
       <div className="col-span-3">
-        <Input
-          placeholder={t('settings.portfolio.ticker')}
+        <TickerAutocomplete
           value={holding.ticker}
-          onChange={(e) => onUpdate(holding.id, 'ticker', e.target.value)}
-          className="text-sm"
+          onChange={(value) => onUpdate(holding.id, 'ticker', value)}
+          onSelect={handleTickerSelect}
+          market={holding.market}
+          placeholder={t('settings.portfolio.ticker')}
         />
       </div>
       <div className="col-span-4">
@@ -156,6 +168,7 @@ function HoldingRow({ holding, onUpdate, onRemove }: HoldingRowProps) {
           className="input text-sm"
         >
           <option value="KRX">KRX</option>
+          <option value="KOSDAQ">KOSDAQ</option>
           <option value="NYSE">NYSE</option>
           <option value="NASDAQ">NASDAQ</option>
         </select>

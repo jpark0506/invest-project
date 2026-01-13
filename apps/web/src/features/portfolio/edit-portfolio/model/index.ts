@@ -43,6 +43,19 @@ export function useHoldingsForm(initialHoldings: PortfolioHolding[] = []) {
     []
   );
 
+  const selectTicker = useCallback(
+    (id: string, ticker: { ticker: string; name: string; market: Market }) => {
+      setHoldings((prev) =>
+        prev.map((h) =>
+          h.id === id
+            ? { ...h, ticker: ticker.ticker, name: ticker.name, market: ticker.market }
+            : h
+        )
+      );
+    },
+    []
+  );
+
   const resetHoldings = useCallback((newHoldings: PortfolioHolding[]) => {
     setHoldings(
       newHoldings.map((h, i) => ({
@@ -72,6 +85,7 @@ export function useHoldingsForm(initialHoldings: PortfolioHolding[] = []) {
     addHolding,
     removeHolding,
     updateHolding,
+    selectTicker,
     resetHoldings,
     totalWeight,
     toPortfolioHoldings,

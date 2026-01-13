@@ -580,6 +580,32 @@ Resources:
         External:
           - '@aws-sdk/*'
 
+  # ========== Ticker Functions ==========
+  TickerSearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: search.handler
+      CodeUri: src/modules/ticker/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tickers/search
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - search.ts
+        External:
+          - '@aws-sdk/*'
+
   # ========== DynamoDB Tables ==========
   UsersTable:
     Type: AWS::DynamoDB::Table

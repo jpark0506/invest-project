@@ -152,5 +152,9 @@
     "currency": "{{value}}원",
     "shares": "{{value}}주",
     "percent": "{{value}}%"
+  },
+  "ticker": {
+    "noResults": "검색 결과가 없습니다",
+    "searchPlaceholder": "종목 검색"
   }
 }

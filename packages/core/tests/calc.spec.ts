@@ -14,9 +14,9 @@ import {
 describe('calculateExecution', () => {
   // Sample holdings for tests
   const sampleHoldings: Holding[] = [
-    { ticker: '069500', name: 'KODEX 200', market: 'KR', targetWeight: 0.5 },
-    { ticker: '379800', name: 'KODEX 미국 S&P500 TR', market: 'KR', targetWeight: 0.3 },
-    { ticker: '439870', name: 'TIGER 미국나스닥100', market: 'KR', targetWeight: 0.2 },
+    { ticker: '069500', name: 'KODEX 200', market: 'KRX', targetWeight: 0.5 },
+    { ticker: '379800', name: 'KODEX 미국 S&P500 TR', market: 'KRX', targetWeight: 0.3 },
+    { ticker: '439870', name: 'TIGER 미국나스닥100', market: 'KRX', targetWeight: 0.2 },
   ];
 
   const samplePrices: Record<string, number> = {
@@ -93,7 +93,7 @@ describe('calculateExecution', () => {
   describe('Case B: Price too high (shares = 0)', () => {
     it('should return 0 shares when price exceeds budget', () => {
       const expensiveHoldings: Holding[] = [
-        { ticker: 'EXPENSIVE', name: 'Expensive Stock', market: 'KR', targetWeight: 1.0 },
+        { ticker: 'EXPENSIVE', name: 'Expensive Stock', market: 'KRX', targetWeight: 1.0 },
       ];
 
       const input: CalculateExecutionInput = {
@@ -119,7 +119,7 @@ describe('calculateExecution', () => {
   describe('Case C: With carry-in from previous cycle', () => {
     it('should include carry-in in calculation', () => {
       const holdings: Holding[] = [
-        { ticker: '069500', name: 'KODEX 200', market: 'KR', targetWeight: 1.0 },
+        { ticker: '069500', name: 'KODEX 200', market: 'KRX', targetWeight: 1.0 },
       ];
 
       const input: CalculateExecutionInput = {
@@ -146,7 +146,7 @@ describe('calculateExecution', () => {
 
     it('should accumulate carry-out when still insufficient', () => {
       const holdings: Holding[] = [
-        { ticker: '069500', name: 'KODEX 200', market: 'KR', targetWeight: 1.0 },
+        { ticker: '069500', name: 'KODEX 200', market: 'KRX', targetWeight: 1.0 },
       ];
 
       const input: CalculateExecutionInput = {
@@ -171,8 +171,8 @@ describe('calculateExecution', () => {
   describe('Case D: Invalid target weight sum', () => {
     it('should throw ValidationError when weights do not sum to 1.0', () => {
       const invalidHoldings: Holding[] = [
-        { ticker: '069500', name: 'KODEX 200', market: 'KR', targetWeight: 0.5 },
-        { ticker: '379800', name: 'KODEX 미국 S&P500', market: 'KR', targetWeight: 0.3 },
+        { ticker: '069500', name: 'KODEX 200', market: 'KRX', targetWeight: 0.5 },
+        { ticker: '379800', name: 'KODEX 미국 S&P500', market: 'KRX', targetWeight: 0.3 },
         // Missing 0.2 - sum is 0.8
       ];
 
@@ -190,9 +190,9 @@ describe('calculateExecution', () => {
 
     it('should allow weights within epsilon tolerance', () => {
       const almostValidHoldings: Holding[] = [
-        { ticker: '069500', name: 'KODEX 200', market: 'KR', targetWeight: 0.3333 },
-        { ticker: '379800', name: 'KODEX 미국 S&P500', market: 'KR', targetWeight: 0.3333 },
-        { ticker: '439870', name: 'TIGER 미국나스닥100', market: 'KR', targetWeight: 0.3334 },
+        { ticker: '069500', name: 'KODEX 200', market: 'KRX', targetWeight: 0.3333 },
+        { ticker: '379800', name: 'KODEX 미국 S&P500', market: 'KRX', targetWeight: 0.3333 },
+        { ticker: '439870', name: 'TIGER 미국나스닥100', market: 'KRX', targetWeight: 0.3334 },
       ];
 
       const input: CalculateExecutionInput = {
@@ -266,7 +266,7 @@ describe('calculateExecution', () => {
       const input: CalculateExecutionInput = {
         monthlyBudget: 1000000,
         cycleWeight: 0, // Invalid
-        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KR', targetWeight: 1.0 }],
+        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: {},
       };
@@ -278,7 +278,7 @@ describe('calculateExecution', () => {
       const input: CalculateExecutionInput = {
         monthlyBudget: -1000,
         cycleWeight: 0.5,
-        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KR', targetWeight: 1.0 }],
+        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: {},
       };
@@ -290,7 +290,7 @@ describe('calculateExecution', () => {
       const input: CalculateExecutionInput = {
         monthlyBudget: 0,
         cycleWeight: 0.5,
-        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KR', targetWeight: 1.0 }],
+        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: {},
       };
@@ -305,7 +305,7 @@ describe('calculateExecution', () => {
       const input: CalculateExecutionInput = {
         monthlyBudget: 1000000,
         cycleWeight: 0.5,
-        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KR', targetWeight: 1.0 }],
+        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: { TEST: -5000 },
       };

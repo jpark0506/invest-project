@@ -66,7 +66,7 @@ export async function createPortfolio(
     userId,
     name: input.name,
     accountTypes: input.accountTypes || [],
-    markets: input.markets || ['KR'],
+    markets: input.markets || ['KRX'],
     themes: input.themes || [],
     holdings: input.holdings,
     isActive: input.isActive ?? true,
