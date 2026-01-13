@@ -26,6 +26,11 @@ export const config = {
 
   // App
   appUrl: process.env.APP_URL || 'http://localhost:5173',
+  apiUrl: process.env.API_URL || 'http://localhost:3000',
+
+  // Kakao OAuth
+  kakaoClientId: process.env.KAKAO_CLIENT_ID || '',
+  kakaoClientSecret: process.env.KAKAO_CLIENT_SECRET || '',
 
   // DynamoDB Local (for testing)
   dynamodbEndpoint: process.env.DDB_ENDPOINT,

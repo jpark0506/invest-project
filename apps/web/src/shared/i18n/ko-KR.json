@@ -6,7 +6,8 @@
     "save": "저장",
     "cancel": "취소",
     "confirm": "확인",
-    "back": "뒤로"
+    "back": "뒤로",
+    "skip": "건너뛰기"
   },
   "auth": {
     "login": "로그인",
@@ -18,7 +19,9 @@
     "magicLinkSent": "로그인 링크를 {{email}}로 보냈습니다",
     "verifying": "로그인 중...",
     "loginSuccess": "로그인 성공",
-    "loginFailed": "로그인에 실패했습니다"
+    "loginFailed": "로그인에 실패했습니다",
+    "or": "또는",
+    "kakaoLogin": "카카오로 로그인"
   },
   "nav": {
     "dashboard": "대시보드",
@@ -95,6 +98,46 @@
       "scheduleDays": "매수일",
       "notifications": "알림 설정",
       "email": "알림 이메일"
+    },
+    "scheduler": {
+      "title": "수동 실행",
+      "description": "포트폴리오와 계획 설정을 기반으로 오늘 날짜의 주문표를 생성합니다. 테스트 모드에서는 실제 저장 없이 로직만 검증합니다.",
+      "dryRun": "테스트 모드 (저장하지 않음)",
+      "trigger": "주문표 생성",
+      "success": "주문표가 생성되었습니다"
+    }
+  },
+  "onboarding": {
+    "title": "환영합니다",
+    "subtitle": "서비스 이용을 위해 몇 가지 동의가 필요합니다",
+    "complete": "설정이 완료되었습니다",
+    "privacy": {
+      "title": "개인정보 처리 동의",
+      "description": "서비스 이용을 위해 개인정보 처리에 동의해 주세요.",
+      "consent": "개인정보 수집 및 이용에 동의합니다 (필수)"
+    },
+    "marketing": {
+      "title": "마케팅 수신 동의",
+      "description": "투자 정보 및 서비스 소식을 받아보시겠습니까?",
+      "consent": "마케팅 정보 수신에 동의합니다 (선택)"
+    },
+    "profile": {
+      "title": "투자 성향",
+      "description": "나의 투자 성향을 선택해 주세요. 나중에 변경할 수 있습니다.",
+      "styles": {
+        "CONSERVATIVE": {
+          "title": "안정형",
+          "description": "원금 보존을 중시하며, 안정적인 수익을 추구합니다"
+        },
+        "BALANCED": {
+          "title": "균형형",
+          "description": "적절한 위험을 감수하며, 안정과 수익의 균형을 추구합니다"
+        },
+        "AGGRESSIVE": {
+          "title": "공격형",
+          "description": "높은 수익을 위해 적극적인 위험을 감수합니다"
+        }
+      }
     }
   },
   "format": {

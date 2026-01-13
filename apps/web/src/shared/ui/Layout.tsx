@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { userApi } from '@/entities/user/api';
+import { useUserStore } from '@/entities/user/model';
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,11 +11,19 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
+  const clearUser = useUserStore((state) => state.clearUser);
 
   const navItems = [
     { path: '/dashboard', label: t('nav.dashboard'), icon: '📊' },
     { path: '/settings', label: t('nav.settings'), icon: '⚙️' },
   ];
+
+  const handleLogout = async () => {
+    await userApi.logout();
+    clearUser();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,6 +31,12 @@ export function Layout({ children }: LayoutProps) {
       <header className="bg-surface border-b border-border sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <h1 className="text-lg font-bold text-text-primary">Invest Assist</h1>
+          <button
+            onClick={handleLogout}
+            className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+          >
+            {t('auth.logout')}
+          </button>
         </div>
       </header>
 

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiClient } from '@/shared/api';
 import { useUserStore } from '@/entities/user/model';
+import { userApi } from '@/entities/user/api';
 import { authApi } from '@/features/auth/login-by-email/model';
 
 export function AuthCallbackPage() {
@@ -14,35 +15,74 @@ export function AuthCallbackPage() {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const provider = searchParams.get('provider');
+    const accessToken = searchParams.get('accessToken');
+    const errorParam = searchParams.get('error');
 
-    if (!token) {
+    // Handle OAuth errors
+    if (errorParam) {
       setError(t('auth.loginFailed'));
       return;
     }
 
-    const verifyToken = async () => {
-      try {
-        const response = await authApi.verify(token);
+    // Handle Kakao OAuth callback
+    if (provider === 'kakao' && accessToken) {
+      handleKakaoCallback(accessToken);
+      return;
+    }
 
-        // Set access token in API client
-        apiClient.setAccessToken(response.accessToken);
+    // Handle magic link callback
+    if (token) {
+      handleMagicLinkCallback(token);
+      return;
+    }
 
-        // Set user in store
-        setUser({
-          id: response.user.id,
-          email: response.user.email,
-          locale: response.user.locale,
-        });
-
-        // Redirect to dashboard
-        navigate('/dashboard', { replace: true });
-      } catch (err) {
-        setError(t('auth.loginFailed'));
-      }
-    };
-
-    verifyToken();
+    // No valid auth data
+    setError(t('auth.loginFailed'));
   }, [searchParams, navigate, t, setUser]);
+
+  const handleKakaoCallback = async (accessToken: string) => {
+    try {
+      // Set access token first (refresh cookie was already set by backend redirect)
+      apiClient.setAccessToken(accessToken);
+
+      // Fetch user info
+      const response = await userApi.getMe();
+
+      // Set user in store
+      setUser(response.user);
+
+      // Redirect based on onboarding status
+      if (response.user.onboardingCompletedAt) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        navigate('/onboarding', { replace: true });
+      }
+    } catch {
+      setError(t('auth.loginFailed'));
+    }
+  };
+
+  const handleMagicLinkCallback = async (token: string) => {
+    try {
+      const response = await authApi.verify(token);
+
+      // Set access token in API client
+      apiClient.setAccessToken(response.accessToken);
+
+      // Set user in store
+      setUser(response.user);
+
+      // Redirect based on onboarding status
+      if (response.user.onboardingCompletedAt) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        navigate('/onboarding', { replace: true });
+      }
+    } catch {
+      setError(t('auth.loginFailed'));
+    }
+  };
 
   if (error) {
     return (

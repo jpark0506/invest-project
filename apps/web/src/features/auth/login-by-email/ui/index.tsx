@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Card } from '@/shared/ui';
+import { config } from '@/shared/config';
 import { authApi } from '../model';
 
 export function LoginPage() {
@@ -26,6 +27,11 @@ export function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleKakaoLogin = () => {
+    // Redirect to backend Kakao OAuth endpoint
+    window.location.href = `${config.apiBaseUrl}/auth/kakao`;
   };
 
   if (sent) {
@@ -66,6 +72,35 @@ export function LoginPage() {
             {t('auth.sendMagicLink')}
           </Button>
         </form>
+
+        <div className="my-6 flex items-center">
+          <div className="flex-1 border-t border-border"></div>
+          <span className="px-4 text-text-secondary text-sm">{t('auth.or')}</span>
+          <div className="flex-1 border-t border-border"></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-[#191919] transition-colors"
+          style={{ backgroundColor: '#FEE500' }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M9 0.5C4.02944 0.5 0 3.69167 0 7.63889C0 10.1278 1.55833 12.3139 3.93333 13.5972L2.93333 17.0417C2.85556 17.3028 3.15 17.5139 3.37778 17.3528L7.43889 14.6278C7.95556 14.7028 8.47222 14.7778 9 14.7778C13.9706 14.7778 18 11.5861 18 7.63889C18 3.69167 13.9706 0.5 9 0.5Z"
+              fill="#191919"
+            />
+          </svg>
+          {t('auth.kakaoLogin')}
+        </button>
       </Card>
     </div>
   );

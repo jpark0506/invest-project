@@ -6,7 +6,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "skip": "Skip"
   },
   "auth": {
     "login": "Login",
@@ -18,7 +19,9 @@
     "magicLinkSent": "We sent a login link to {{email}}",
     "verifying": "Logging in...",
     "loginSuccess": "Login successful",
-    "loginFailed": "Login failed"
+    "loginFailed": "Login failed",
+    "or": "or",
+    "kakaoLogin": "Login with Kakao"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -95,6 +98,46 @@
       "scheduleDays": "Purchase Days",
       "notifications": "Notifications",
       "email": "Email"
+    },
+    "scheduler": {
+      "title": "Manual Run",
+      "description": "Generate an order sheet for today based on your portfolio and plan settings. Test mode validates logic without saving.",
+      "dryRun": "Test mode (don't save)",
+      "trigger": "Generate Order Sheet",
+      "success": "Order sheet generated successfully"
+    }
+  },
+  "onboarding": {
+    "title": "Welcome",
+    "subtitle": "A few consents are required to use the service",
+    "complete": "Setup complete",
+    "privacy": {
+      "title": "Privacy Policy Agreement",
+      "description": "Please agree to our privacy policy to use the service.",
+      "consent": "I agree to the collection and use of personal information (Required)"
+    },
+    "marketing": {
+      "title": "Marketing Agreement",
+      "description": "Would you like to receive investment news and service updates?",
+      "consent": "I agree to receive marketing information (Optional)"
+    },
+    "profile": {
+      "title": "Investment Style",
+      "description": "Select your investment style. You can change this later.",
+      "styles": {
+        "CONSERVATIVE": {
+          "title": "Conservative",
+          "description": "Prioritize capital preservation with stable returns"
+        },
+        "BALANCED": {
+          "title": "Balanced",
+          "description": "Balance between stability and growth with moderate risk"
+        },
+        "AGGRESSIVE": {
+          "title": "Aggressive",
+          "description": "Accept higher risk for potentially higher returns"
+        }
+      }
     }
   },
   "format": {

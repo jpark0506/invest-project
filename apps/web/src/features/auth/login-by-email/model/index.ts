@@ -1,15 +1,12 @@
 import { apiClient } from '@/shared/api';
+import type { User } from '@/entities/user/api';
 
 export interface StartAuthResponse {
   ok: boolean;
 }
 
 export interface VerifyAuthResponse {
-  user: {
-    id: string;
-    email: string;
-    locale: string;
-  };
+  user: User;
   accessToken: string;
 }
 

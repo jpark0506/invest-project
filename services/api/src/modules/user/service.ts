@@ -20,6 +20,9 @@ export async function getMe(userId: string): Promise<MeResponse> {
       id: user.userId,
       email: user.email,
       locale: user.locale,
+      onboardingCompletedAt: user.onboardingCompletedAt ?? null,
+      consents: user.consents,
+      profile: user.profile,
     },
   };
 }

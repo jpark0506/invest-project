@@ -2,6 +2,8 @@
  * Auth module types
  */
 
+import type { UserConsents, UserProfile } from '../user/types';
+
 export interface AuthToken {
   tokenHash: string;
   email: string;
@@ -31,6 +33,9 @@ export interface VerifyAuthResponse {
     id: string;
     email: string;
     locale: string;
+    onboardingCompletedAt: string | null;
+    consents?: UserConsents;
+    profile?: UserProfile;
   };
   accessToken: string;
 }

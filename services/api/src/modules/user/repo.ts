@@ -6,7 +6,7 @@ import { PutCommand, GetCommand, QueryCommand, UpdateCommand } from '@aws-sdk/li
 import { v4 as uuidv4 } from 'uuid';
 import { docClient } from '../../shared/db';
 import { config } from '../../shared/config';
-import type { User } from './types';
+import type { User, CompleteOnboardingRequest, UserConsents, UserProfile, AuthProvider } from './types';
 
 const tableName = config.tables.users;
 
@@ -42,18 +42,41 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   return (result.Items?.[0] as User) || null;
 }
 
+interface ProviderInfo {
+  provider: AuthProvider;
+  providerId: string;
+}
+
 /**
  * Create or update user by email
  * Returns existing user if found, creates new user if not
  */
-export async function upsertUser(email: string): Promise<User> {
+export async function upsertUser(email: string, providerInfo?: ProviderInfo): Promise<User> {
   const normalizedEmail = email.toLowerCase().trim();
 
   // Check if user exists
   const existingUser = await getUserByEmail(normalizedEmail);
   if (existingUser) {
-    // Update lastSeen/updatedAt
+    // Update lastSeen/updatedAt and provider info if provided
     const now = new Date().toISOString();
+
+    if (providerInfo && !existingUser.provider) {
+      // Link provider to existing user
+      await docClient.send(
+        new UpdateCommand({
+          TableName: tableName,
+          Key: { userId: existingUser.userId },
+          UpdateExpression: 'SET updatedAt = :updatedAt, provider = :provider, providerId = :providerId',
+          ExpressionAttributeValues: {
+            ':updatedAt': now,
+            ':provider': providerInfo.provider,
+            ':providerId': providerInfo.providerId,
+          },
+        })
+      );
+      return { ...existingUser, updatedAt: now, provider: providerInfo.provider, providerId: providerInfo.providerId };
+    }
+
     await docClient.send(
       new UpdateCommand({
         TableName: tableName,
@@ -73,6 +96,11 @@ export async function upsertUser(email: string): Promise<User> {
     userId: uuidv4(),
     email: normalizedEmail,
     locale: 'ko-KR',
+    onboardingCompletedAt: null,
+    ...(providerInfo && {
+      provider: providerInfo.provider,
+      providerId: providerInfo.providerId,
+    }),
     createdAt: now,
     updatedAt: now,
   };
@@ -102,4 +130,53 @@ export async function updateUserLocale(userId: string, locale: string): Promise<
       },
     })
   );
+}
+
+/**
+ * Complete user onboarding
+ */
+export async function completeOnboarding(
+  userId: string,
+  request: CompleteOnboardingRequest
+): Promise<User> {
+  const now = new Date().toISOString();
+
+  const consents: UserConsents = {
+    privacy: request.consents.privacy,
+    privacyAt: now,
+    marketing: request.consents.marketing,
+    ...(request.consents.marketing && { marketingAt: now }),
+  };
+
+  const profile: UserProfile | undefined = request.profile
+    ? {
+        ...(request.profile.investmentStyle && {
+          investmentStyle: request.profile.investmentStyle,
+        }),
+        ...(request.profile.expectedMonthlyBudget && {
+          expectedMonthlyBudget: request.profile.expectedMonthlyBudget,
+        }),
+      }
+    : undefined;
+
+  await docClient.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: { userId },
+      UpdateExpression:
+        'SET onboardingCompletedAt = :onboardingCompletedAt, consents = :consents, profile = :profile, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':onboardingCompletedAt': now,
+        ':consents': consents,
+        ':profile': profile || null,
+        ':updatedAt': now,
+      },
+    })
+  );
+
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new Error('User not found after update');
+  }
+  return user;
 }

@@ -22,6 +22,9 @@ Globals:
         JWT_SECRET_ARN: !Ref JwtSecretArn
         SES_FROM_EMAIL: !Ref SesFromEmail
         APP_URL: !Ref AppUrl
+        API_URL: !Ref ApiUrl
+        KAKAO_CLIENT_ID: !Ref KakaoClientId
+        KAKAO_CLIENT_SECRET: !Ref KakaoClientSecret
 
 Parameters:
   Environment:
@@ -40,6 +43,19 @@ Parameters:
     Type: String
     Description: Frontend application URL
     Default: http://localhost:5173
+  ApiUrl:
+    Type: String
+    Description: Backend API URL
+    Default: http://localhost:3000
+  KakaoClientId:
+    Type: String
+    Description: Kakao OAuth Client ID
+    Default: ''
+  KakaoClientSecret:
+    Type: String
+    Description: Kakao OAuth Client Secret
+    NoEcho: true
+    Default: ''
 
 Resources:
   # ========== Shared Lambda Role ==========
@@ -220,6 +236,54 @@ Resources:
         External:
           - '@aws-sdk/*'
 
+  AuthKakaoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: kakao.handler
+      CodeUri: src/modules/auth/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/kakao
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - kakao.ts
+        External:
+          - '@aws-sdk/*'
+
+  AuthKakaoCallbackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: kakaoCallback.handler
+      CodeUri: src/modules/auth/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /auth/kakao/callback
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - kakaoCallback.ts
+        External:
+          - '@aws-sdk/*'
+
   # ========== User Functions ==========
   MeFunction:
     Type: AWS::Serverless::Function
@@ -242,6 +306,30 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - me.ts
+        External:
+          - '@aws-sdk/*'
+
+  CompleteOnboardingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: completeOnboarding.handler
+      CodeUri: src/modules/user/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /onboarding/complete
+            Method: PUT
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - completeOnboarding.ts
         External:
           - '@aws-sdk/*'
 
@@ -440,6 +528,31 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - run.ts
+        External:
+          - '@aws-sdk/*'
+
+  SchedulerTriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: trigger.handler
+      CodeUri: src/modules/scheduler/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /scheduler/trigger
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - trigger.ts
         External:
           - '@aws-sdk/*'
 

@@ -158,6 +158,9 @@ export async function verifyAuth(token: string): Promise<{
         id: user.userId,
         email: user.email,
         locale: user.locale,
+        onboardingCompletedAt: user.onboardingCompletedAt ?? null,
+        consents: user.consents,
+        profile: user.profile,
       },
       accessToken,
     },
@@ -229,4 +232,63 @@ export async function refreshAuth(refreshTokenId: string): Promise<{
 export async function logout(refreshTokenId: string): Promise<void> {
   await authRepo.revokeRefreshToken(refreshTokenId);
   logger.info('User logged out', { refreshTokenId });
+}
+
+/**
+ * Verify Kakao OAuth and create session
+ */
+export async function verifyKakaoAuth(
+  email: string,
+  kakaoId: string
+): Promise<{
+  response: VerifyAuthResponse;
+  refreshToken: string;
+  refreshTokenId: string;
+}> {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Upsert user with kakao provider info
+  const user = await userRepo.upsertUser(normalizedEmail, {
+    provider: 'kakao',
+    providerId: kakaoId,
+  });
+
+  // Generate tokens
+  const accessToken = await generateAccessToken({
+    sub: user.userId,
+    email: user.email,
+  });
+
+  const refreshToken = generateToken();
+  const refreshTokenHash = hashToken(refreshToken);
+  const refreshTokenId = uuidv4();
+
+  // Save refresh token
+  const refreshExpiresAt = Math.floor(Date.now() / 1000) + REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60;
+
+  await authRepo.saveRefreshToken({
+    tokenId: refreshTokenId,
+    userId: user.userId,
+    tokenHash: refreshTokenHash,
+    expiresAt: refreshExpiresAt,
+    createdAt: new Date().toISOString(),
+  });
+
+  logger.info('User authenticated via Kakao', { userId: user.userId, kakaoId });
+
+  return {
+    response: {
+      user: {
+        id: user.userId,
+        email: user.email,
+        locale: user.locale,
+        onboardingCompletedAt: user.onboardingCompletedAt ?? null,
+        consents: user.consents,
+        profile: user.profile,
+      },
+      accessToken,
+    },
+    refreshToken,
+    refreshTokenId,
+  };
 }

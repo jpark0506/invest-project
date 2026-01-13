@@ -73,4 +73,7 @@ jobs:
               Environment=prod \
               JwtSecretArn=${{ secrets.JWT_SECRET_ARN }} \
               SesFromEmail=${{ secrets.SES_FROM_EMAIL }} \
-              AppUrl=${{ secrets.APP_URL }}
+              AppUrl=${{ secrets.APP_URL }} \
+              ApiUrl=${{ secrets.API_URL }} \
+              KakaoClientId=${{ secrets.KAKAO_CLIENT_ID }} \
+              KakaoClientSecret=${{ secrets.KAKAO_CLIENT_SECRET }}

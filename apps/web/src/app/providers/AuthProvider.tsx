@@ -21,11 +21,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (hasToken) {
           // Fetch user data
           const { user } = await userApi.getMe();
-          setUser({
-            id: user.id,
-            email: user.email,
-            locale: user.locale,
-          });
+          setUser(user);
         } else {
           clearUser();
         }
