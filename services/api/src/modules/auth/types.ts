@@ -32,6 +32,7 @@ export interface VerifyAuthResponse {
   user: {
     id: string;
     email: string;
+    nickname?: string;
     locale: string;
     onboardingCompletedAt: string | null;
     consents?: UserConsents;

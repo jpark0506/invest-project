@@ -21,6 +21,7 @@ export type AuthProvider = 'email' | 'kakao';
 export interface User {
   userId: string;
   email: string;
+  nickname?: string; // Display name (from Kakao or user-provided)
   locale: string;
   provider?: AuthProvider;
   providerId?: string; // External provider user ID (e.g., Kakao ID)
@@ -35,6 +36,7 @@ export interface MeResponse {
   user: {
     id: string;
     email: string;
+    nickname?: string;
     locale: string;
     onboardingCompletedAt: string | null;
     consents?: UserConsents;

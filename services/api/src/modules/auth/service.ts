@@ -239,7 +239,8 @@ export async function logout(refreshTokenId: string): Promise<void> {
  */
 export async function verifyKakaoAuth(
   email: string,
-  kakaoId: string
+  kakaoId: string,
+  nickname?: string
 ): Promise<{
   response: VerifyAuthResponse;
   refreshToken: string;
@@ -251,6 +252,7 @@ export async function verifyKakaoAuth(
   const user = await userRepo.upsertUser(normalizedEmail, {
     provider: 'kakao',
     providerId: kakaoId,
+    nickname,
   });
 
   // Generate tokens
@@ -281,6 +283,7 @@ export async function verifyKakaoAuth(
       user: {
         id: user.userId,
         email: user.email,
+        nickname: user.nickname,
         locale: user.locale,
         onboardingCompletedAt: user.onboardingCompletedAt ?? null,
         consents: user.consents,

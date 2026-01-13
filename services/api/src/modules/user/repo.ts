@@ -45,6 +45,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
 interface ProviderInfo {
   provider: AuthProvider;
   providerId: string;
+  nickname?: string;
 }
 
 /**
@@ -62,19 +63,32 @@ export async function upsertUser(email: string, providerInfo?: ProviderInfo): Pr
 
     if (providerInfo && !existingUser.provider) {
       // Link provider to existing user
+      const updateExpr = providerInfo.nickname
+        ? 'SET updatedAt = :updatedAt, provider = :provider, providerId = :providerId, nickname = :nickname'
+        : 'SET updatedAt = :updatedAt, provider = :provider, providerId = :providerId';
+      const exprValues: Record<string, string> = {
+        ':updatedAt': now,
+        ':provider': providerInfo.provider,
+        ':providerId': providerInfo.providerId,
+      };
+      if (providerInfo.nickname) {
+        exprValues[':nickname'] = providerInfo.nickname;
+      }
       await docClient.send(
         new UpdateCommand({
           TableName: tableName,
           Key: { userId: existingUser.userId },
-          UpdateExpression: 'SET updatedAt = :updatedAt, provider = :provider, providerId = :providerId',
-          ExpressionAttributeValues: {
-            ':updatedAt': now,
-            ':provider': providerInfo.provider,
-            ':providerId': providerInfo.providerId,
-          },
+          UpdateExpression: updateExpr,
+          ExpressionAttributeValues: exprValues,
         })
       );
-      return { ...existingUser, updatedAt: now, provider: providerInfo.provider, providerId: providerInfo.providerId };
+      return {
+        ...existingUser,
+        updatedAt: now,
+        provider: providerInfo.provider,
+        providerId: providerInfo.providerId,
+        ...(providerInfo.nickname && { nickname: providerInfo.nickname }),
+      };
     }
 
     await docClient.send(
@@ -95,6 +109,7 @@ export async function upsertUser(email: string, providerInfo?: ProviderInfo): Pr
   const user: User = {
     userId: uuidv4(),
     email: normalizedEmail,
+    ...(providerInfo?.nickname && { nickname: providerInfo.nickname }),
     locale: 'ko-KR',
     onboardingCompletedAt: null,
     ...(providerInfo && {

@@ -23,7 +23,7 @@ export const handler: APIGatewayProxyHandler = async () => {
       client_id: config.kakaoClientId,
       redirect_uri: redirectUri,
       response_type: 'code',
-      scope: 'account_email',
+      scope: 'profile_nickname',
     });
 
     const authUrl = `${KAKAO_AUTH_URL}?${params.toString()}`;

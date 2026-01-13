@@ -17,6 +17,7 @@ export interface UserProfile {
 export interface User {
   id: string;
   email: string;
+  nickname?: string;
   locale: string;
   onboardingCompletedAt: string | null;
   consents?: UserConsents;

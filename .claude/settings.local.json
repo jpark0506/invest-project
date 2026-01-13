@@ -23,7 +23,11 @@
       "Bash(gh run list:*)",
       "Bash(git log:*)",
       "Bash(gh secret set:*)",
-      "Bash(gh secret:*)"
+      "Bash(gh secret:*)",
+      "Bash(git merge:*)",
+      "Bash(git stash:*)",
+      "Bash(git stash pop:*)",
+      "Bash(gh run watch:*)"
     ]
   }
 }

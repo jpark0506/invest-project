@@ -20,10 +20,13 @@ interface KakaoTokenResponse {
 
 interface KakaoUserResponse {
   id: number;
+  properties?: {
+    nickname?: string;
+  };
   kakao_account?: {
-    email?: string;
-    is_email_valid?: boolean;
-    is_email_verified?: boolean;
+    profile?: {
+      nickname?: string;
+    };
   };
 }
 
@@ -50,18 +53,24 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     // Get user info from Kakao
     const kakaoUser = await getKakaoUserInfo(tokenResponse.access_token);
-    if (!kakaoUser || !kakaoUser.kakao_account?.email) {
-      logger.error('Failed to get Kakao user email');
-      return redirectToFrontendWithError('email_required');
+    if (!kakaoUser) {
+      logger.error('Failed to get Kakao user info');
+      return redirectToFrontendWithError('user_info_failed');
     }
 
-    const email = kakaoUser.kakao_account.email;
-    logger.info('Kakao user authenticated', { email, kakaoId: kakaoUser.id });
+    const kakaoId = String(kakaoUser.id);
+    const nickname = kakaoUser.properties?.nickname ||
+                     kakaoUser.kakao_account?.profile?.nickname ||
+                     `사용자${kakaoId.slice(-4)}`;
 
-    // Create or get user and generate tokens
+    logger.info('Kakao user authenticated', { kakaoId, nickname });
+
+    // Create or get user and generate tokens (use kakao_{id}@kakao.local as placeholder email)
+    const placeholderEmail = `kakao_${kakaoId}@kakao.local`;
     const { response, refreshToken, refreshTokenId } = await verifyKakaoAuth(
-      email,
-      String(kakaoUser.id)
+      placeholderEmail,
+      kakaoId,
+      nickname
     );
 
     // Build refresh token cookie
