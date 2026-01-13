@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Layout, toast } from '@/shared/ui';
+import { Layout, toast, CardSkeleton, LoadingWrapper, ConfirmModal } from '@/shared/ui';
 import { usePortfolio, useUpdatePortfolio } from '@/entities/portfolio/model';
 import { usePlan, useUpdatePlan } from '@/entities/plan/model';
 import { useUserStore } from '@/entities/user/model';
@@ -59,24 +59,28 @@ export function SettingsPage() {
       {/* Portfolio Settings */}
       <section className="mb-8">
         <h3 className="section-title">{t('settings.portfolio.title')}</h3>
-        <EditPortfolioForm
-          portfolio={portfolioData?.portfolio ?? null}
-          isLoading={isPortfolioLoading}
-          onSubmit={handlePortfolioSubmit}
-          isPending={updatePortfolio.isPending}
-        />
+        <LoadingWrapper isLoading={isPortfolioLoading} skeleton={<CardSkeleton />}>
+          <EditPortfolioForm
+            portfolio={portfolioData?.portfolio ?? null}
+            isLoading={false}
+            onSubmit={handlePortfolioSubmit}
+            isPending={updatePortfolio.isPending}
+          />
+        </LoadingWrapper>
       </section>
 
       {/* Plan Settings */}
       <section className="mb-8">
         <h3 className="section-title">{t('settings.plan.title')}</h3>
-        <EditPlanForm
-          plan={planData?.plan ?? null}
-          isLoading={isPlanLoading}
-          onSubmit={handlePlanSubmit}
-          isPending={updatePlan.isPending}
-          userEmail={user?.email}
-        />
+        <LoadingWrapper isLoading={isPlanLoading} skeleton={<CardSkeleton />}>
+          <EditPlanForm
+            plan={planData?.plan ?? null}
+            isLoading={false}
+            onSubmit={handlePlanSubmit}
+            isPending={updatePlan.isPending}
+            userEmail={user?.email}
+          />
+        </LoadingWrapper>
       </section>
 
       {/* Manual Scheduler Trigger - for testing */}
@@ -132,49 +136,39 @@ export function SettingsPage() {
           <p className="text-sm text-text-secondary">
             {t('settings.account.description')}
           </p>
-          {!showDeleteConfirm ? (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="text-error text-sm font-medium hover:underline"
-            >
-              {t('settings.account.delete')}
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-error font-medium">
-                {t('settings.account.confirmMessage')}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={async () => {
-                    setIsDeleting(true);
-                    try {
-                      await userApi.deleteAccount();
-                      clearUser();
-                      navigate('/login');
-                      toast.success(t('settings.account.deleted'));
-                    } catch {
-                      toast.error(t('common.error'));
-                    } finally {
-                      setIsDeleting(false);
-                    }
-                  }}
-                  disabled={isDeleting}
-                  className="px-4 py-2 bg-error text-white rounded-lg text-sm font-medium disabled:opacity-50"
-                >
-                  {isDeleting ? t('common.loading') : t('settings.account.confirmDelete')}
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 bg-border text-text-primary rounded-lg text-sm font-medium"
-                >
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          )}
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="text-error text-sm font-medium hover:underline"
+          >
+            {t('settings.account.delete')}
+          </button>
         </div>
       </section>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          setIsDeleting(true);
+          try {
+            await userApi.deleteAccount();
+            clearUser();
+            navigate('/login');
+            toast.success(t('settings.account.deleted'));
+          } catch {
+            toast.error(t('common.error'));
+          } finally {
+            setIsDeleting(false);
+            setShowDeleteConfirm(false);
+          }
+        }}
+        title={t('settings.account.delete')}
+        message={t('settings.account.confirmMessage')}
+        confirmText={t('settings.account.confirmDelete')}
+        cancelText={t('common.cancel')}
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </Layout>
   );
 }

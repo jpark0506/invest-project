@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { userApi, type InvestmentStyle } from '@/entities/user/api';
 import { useUserStore } from '@/entities/user/model';
-import { toast } from '@/shared/ui';
+import { toast, Checkbox } from '@/shared/ui';
 
 type Step = 'privacy' | 'marketing' | 'profile';
 
@@ -14,9 +14,23 @@ export function OnboardingPage() {
   const setUser = useUserStore((state) => state.setUser);
 
   const [currentStep, setCurrentStep] = useState<Step>('privacy');
+  const [displayedStep, setDisplayedStep] = useState<Step>('privacy');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [investmentStyle, setInvestmentStyle] = useState<InvestmentStyle | undefined>();
+
+  // Handle step transition animation
+  useEffect(() => {
+    if (currentStep !== displayedStep) {
+      setIsTransitioning(true);
+      const timer = setTimeout(() => {
+        setDisplayedStep(currentStep);
+        setIsTransitioning(false);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, displayedStep]);
 
   const completeOnboarding = useMutation({
     mutationFn: userApi.completeOnboarding,
@@ -84,7 +98,14 @@ export function OnboardingPage() {
         </div>
 
         <div className="card p-6">
-          {currentStep === 'privacy' && (
+          <div
+            className="transition-all duration-150 ease-out"
+            style={{
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning ? 'translateX(-8px)' : 'translateX(0)',
+            }}
+          >
+          {displayedStep === 'privacy' && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-semibold text-text-primary mb-2">
@@ -95,20 +116,11 @@ export function OnboardingPage() {
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={privacyConsent}
-                    onChange={(e) => setPrivacyConsent(e.target.checked)}
-                    className="mt-1 rounded border-border"
-                  />
-                  <span className="text-sm text-text-primary">
-                    {t('onboarding.privacy.consent')}
-                    <span className="text-danger ml-1">*</span>
-                  </span>
-                </label>
-              </div>
+              <Checkbox
+                checked={privacyConsent}
+                onChange={(e) => setPrivacyConsent(e.target.checked)}
+                label={t('onboarding.privacy.consent')}
+              />
 
               <button
                 onClick={handleNext}
@@ -120,7 +132,7 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {currentStep === 'marketing' && (
+          {displayedStep === 'marketing' && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-semibold text-text-primary mb-2">
@@ -131,19 +143,11 @@ export function OnboardingPage() {
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={marketingConsent}
-                    onChange={(e) => setMarketingConsent(e.target.checked)}
-                    className="mt-1 rounded border-border"
-                  />
-                  <span className="text-sm text-text-primary">
-                    {t('onboarding.marketing.consent')}
-                  </span>
-                </label>
-              </div>
+              <Checkbox
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+                label={t('onboarding.marketing.consent')}
+              />
 
               <button onClick={handleNext} className="btn-primary w-full">
                 {t('common.confirm')}
@@ -151,7 +155,7 @@ export function OnboardingPage() {
             </div>
           )}
 
-          {currentStep === 'profile' && (
+          {displayedStep === 'profile' && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-semibold text-text-primary mb-2">
@@ -203,6 +207,7 @@ export function OnboardingPage() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
+import { PageLoader } from '@/shared/ui';
 import { AuthCallbackPage } from '@/pages/auth-callback/ui';
 
 // Lazy load pages for code splitting
@@ -20,14 +21,6 @@ const LoginPage = lazy(() =>
 const OnboardingPage = lazy(() =>
   import('@/pages/onboarding/ui').then((m) => ({ default: m.OnboardingPage }))
 );
-
-function PageLoader() {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
-  );
-}
 
 export function AppRoutes() {
   return (

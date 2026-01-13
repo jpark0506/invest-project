@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Layout, Card, Button } from '@/shared/ui';
+import { Layout, Card, Button, SectionLoader, ErrorFallback, Modal } from '@/shared/ui';
 import { useExecutions } from '@/entities/execution/model';
 
 interface StatsData {
@@ -70,9 +70,7 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-        </div>
+        <SectionLoader className="py-12" />
       </Layout>
     );
   }
@@ -80,9 +78,7 @@ export function DashboardPage() {
   if (error) {
     return (
       <Layout>
-        <Card className="text-center py-12">
-          <p className="text-error">{t('common.error')}</p>
-        </Card>
+        <ErrorFallback message={t('common.error')} />
       </Layout>
     );
   }
@@ -160,69 +156,58 @@ export function DashboardPage() {
         )}
       </div>
 
-      {/* Report Modal */}
-      {showReport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-surface rounded-2xl w-full max-w-md max-h-[80vh] overflow-auto">
-            <div className="sticky top-0 bg-surface p-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-lg font-bold">{t('dashboard.report.title')}</h3>
-              <button
-                onClick={() => setShowReport(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
-              >
-                ✕
-              </button>
+      <Modal
+        isOpen={showReport}
+        onClose={() => setShowReport(false)}
+        title={t('dashboard.report.title')}
+      >
+        <div className="p-4 space-y-6">
+          {/* Summary */}
+          <section>
+            <h4 className="text-sm font-semibold text-text-secondary mb-3">
+              {t('dashboard.report.summary')}
+            </h4>
+            <div className="bg-background rounded-xl p-4 space-y-3">
+              <div className="flex justify-between">
+                <span className="text-text-secondary">{t('dashboard.stats.totalInvested')}</span>
+                <span className="font-bold text-primary">{stats.totalBudget.toLocaleString()}원</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-secondary">{t('dashboard.report.confirmed')}</span>
+                <span className="font-medium">{stats.confirmedCount}회</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-secondary">{t('dashboard.report.pending')}</span>
+                <span className="font-medium">{stats.pendingCount}회</span>
+              </div>
             </div>
+          </section>
 
-            <div className="p-4 space-y-6">
-              {/* Summary */}
-              <section>
-                <h4 className="text-sm font-semibold text-text-secondary mb-3">
-                  {t('dashboard.report.summary')}
-                </h4>
-                <div className="bg-background rounded-xl p-4 space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">{t('dashboard.stats.totalInvested')}</span>
-                    <span className="font-bold text-primary">{stats.totalBudget.toLocaleString()}원</span>
+          {/* Monthly Breakdown */}
+          <section>
+            <h4 className="text-sm font-semibold text-text-secondary mb-3">
+              {t('dashboard.report.monthly')}
+            </h4>
+            <div className="space-y-2">
+              {stats.monthlyStats.length > 0 ? (
+                stats.monthlyStats.map(({ month, budget, count }) => (
+                  <div key={month} className="bg-background rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">{month}</p>
+                      <p className="text-xs text-text-secondary">{count}회 실행</p>
+                    </div>
+                    <p className="font-bold text-primary">{budget.toLocaleString()}원</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">{t('dashboard.report.confirmed')}</span>
-                    <span className="font-medium">{stats.confirmedCount}회</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">{t('dashboard.report.pending')}</span>
-                    <span className="font-medium">{stats.pendingCount}회</span>
-                  </div>
-                </div>
-              </section>
-
-              {/* Monthly Breakdown */}
-              <section>
-                <h4 className="text-sm font-semibold text-text-secondary mb-3">
-                  {t('dashboard.report.monthly')}
-                </h4>
-                <div className="space-y-2">
-                  {stats.monthlyStats.length > 0 ? (
-                    stats.monthlyStats.map(({ month, budget, count }) => (
-                      <div key={month} className="bg-background rounded-xl p-3 flex justify-between items-center">
-                        <div>
-                          <p className="font-medium">{month}</p>
-                          <p className="text-xs text-text-secondary">{count}회 실행</p>
-                        </div>
-                        <p className="font-bold text-primary">{budget.toLocaleString()}원</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-text-secondary text-center py-4">
-                      {t('dashboard.noExecutions')}
-                    </p>
-                  )}
-                </div>
-              </section>
+                ))
+              ) : (
+                <p className="text-text-secondary text-center py-4">
+                  {t('dashboard.noExecutions')}
+                </p>
+              )}
             </div>
-          </div>
+          </section>
         </div>
-      )}
+      </Modal>
     </Layout>
   );
 }
