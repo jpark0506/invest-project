@@ -61,4 +61,9 @@ export const userApi = {
       apiClient.setAccessToken(null);
     }
   },
+
+  deleteAccount: async () => {
+    await apiClient.delete<{ ok: boolean }>('/account');
+    apiClient.setAccessToken(null);
+  },
 };

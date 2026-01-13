@@ -333,6 +333,30 @@ Resources:
         External:
           - '@aws-sdk/*'
 
+  DeleteAccountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deleteAccount.handler
+      CodeUri: src/modules/user/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /account
+            Method: DELETE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - deleteAccount.ts
+        External:
+          - '@aws-sdk/*'
+
   # ========== Portfolio Functions ==========
   GetPortfolioFunction:
     Type: AWS::Serverless::Function

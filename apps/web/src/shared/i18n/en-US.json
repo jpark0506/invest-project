@@ -105,6 +105,14 @@
       "dryRun": "Test mode (don't save)",
       "trigger": "Generate Order Sheet",
       "success": "Order sheet generated successfully"
+    },
+    "account": {
+      "title": "Account",
+      "description": "Deleting your account will permanently remove all your data.",
+      "delete": "Delete Account",
+      "confirmMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+      "confirmDelete": "Delete",
+      "deleted": "Account deleted successfully"
     }
   },
   "onboarding": {

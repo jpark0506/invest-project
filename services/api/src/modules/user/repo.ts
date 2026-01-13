@@ -2,7 +2,7 @@
  * User repository
  */
 
-import { PutCommand, GetCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand, QueryCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 import { docClient } from '../../shared/db';
 import { config } from '../../shared/config';
@@ -194,4 +194,16 @@ export async function completeOnboarding(
     throw new Error('User not found after update');
   }
   return user;
+}
+
+/**
+ * Delete user account
+ */
+export async function deleteUser(userId: string): Promise<void> {
+  await docClient.send(
+    new DeleteCommand({
+      TableName: tableName,
+      Key: { userId },
+    })
+  );
 }

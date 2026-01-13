@@ -36,15 +36,15 @@
   }
 
   .btn-lg {
-    @apply h-[52px] px-6 text-base;
+    @apply py-4 px-6 text-base;
   }
 
   .btn-md {
-    @apply h-[44px] px-5 text-sm;
+    @apply py-3 px-5 text-sm;
   }
 
   .btn-sm {
-    @apply h-[36px] px-4 text-xs;
+    @apply py-2 px-4 text-xs;
   }
 
   .btn-full {
