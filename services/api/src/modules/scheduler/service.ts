@@ -7,7 +7,7 @@ import { logger } from '../../shared/logger';
 import * as planRepo from '../plan/repo';
 import * as portfolioRepo from '../portfolio/repo';
 import * as executionRepo from '../execution/repo';
-import { fetchPrices } from './priceFetcher';
+import { fetchPricesWithMarket } from './priceFetcher';
 import { sendEmailNotification } from './notification';
 import type { RunSchedulerInput, RunSchedulerOutput, SchedulerError } from './types';
 import type { Execution, ExecutionStatus } from '@invest-assist/core';
@@ -83,9 +83,12 @@ export async function processPlanForUser(
       return { success: true };
     }
 
-    // Fetch prices
-    const tickers = portfolio.holdings.map((h: { ticker: string }) => h.ticker);
-    const prices = await fetchPrices(tickers);
+    // Fetch prices with market info
+    const holdingsWithMarket = portfolio.holdings.map((h) => ({
+      ticker: h.ticker,
+      market: h.market,
+    }));
+    const prices = await fetchPricesWithMarket(holdingsWithMarket);
 
     // Get carry-in from previous cycle
     const carryInByTicker = await getCarryIn(userId, yearMonth, cycleIndex);

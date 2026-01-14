@@ -49,19 +49,27 @@
   }
 
   .btn-lg {
-    @apply h-16 px-6 text-base;
+    height: 56px;
+    min-height: 56px;
+    @apply px-6 text-base;
   }
 
   .btn-md {
-    @apply h-14 px-5 text-base;
+    height: 52px;
+    min-height: 52px;
+    @apply px-5 text-base;
   }
 
   .btn-sm {
-    @apply h-12 px-4 text-sm;
+    height: 44px;
+    min-height: 44px;
+    @apply px-4 text-sm;
   }
 
   .btn-xs {
-    @apply h-10 px-3 text-sm;
+    height: 36px;
+    min-height: 36px;
+    @apply px-3 text-sm;
   }
 
   .btn-full {
@@ -85,7 +93,9 @@
 
   /* Input styles */
   .input {
-    @apply w-full h-12 px-4 rounded-xl
+    height: 52px;
+    min-height: 52px;
+    @apply w-full px-4 rounded-xl
            bg-gray-50 border border-gray-200
            text-text-primary text-base
            placeholder:text-text-tertiary
@@ -94,7 +104,8 @@
   }
 
   .input-lg {
-    @apply h-14;
+    height: 56px;
+    min-height: 56px;
   }
 
   /* Card styles */
