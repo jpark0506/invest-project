@@ -49,19 +49,19 @@
   }
 
   .btn-lg {
-    @apply h-14 px-6 text-base;
+    @apply h-16 px-6 text-base;
   }
 
   .btn-md {
-    @apply h-12 px-5 text-sm;
+    @apply h-14 px-5 text-base;
   }
 
   .btn-sm {
-    @apply h-10 px-4 text-sm;
+    @apply h-12 px-4 text-sm;
   }
 
   .btn-xs {
-    @apply h-8 px-3 text-xs;
+    @apply h-10 px-3 text-sm;
   }
 
   .btn-full {
