@@ -1,6 +1,6 @@
 /**
  * Price fetcher - fetches stock prices from multiple sources
- * - Korean stocks (KRX/KOSDAQ): NAVER Finance
+ * - Korean stocks (KRX/KOSDAQ): NAVER Finance Mobile API
  * - US stocks (NYSE/NASDAQ): Yahoo Finance
  */
 
@@ -8,40 +8,45 @@ import type { Market } from '@invest-assist/core';
 import { logger } from '../../shared/logger';
 import type { PriceData } from './types';
 
-const NAVER_FINANCE_URL = 'https://finance.naver.com/item/main.naver';
-
 interface HoldingWithMarket {
   ticker: string;
   market: Market;
 }
 
+interface NaverBasicResponse {
+  closePrice?: string;
+  stockName?: string;
+}
+
 /**
  * Fetch current price for a Korean stock ticker
- * Uses Naver Finance page scraping
+ * Uses NAVER Finance Mobile API
  */
 async function fetchKoreanPrice(ticker: string): Promise<number> {
-  const url = `${NAVER_FINANCE_URL}?code=${ticker}`;
-  const response = await fetch(url);
+  const url = `https://m.stock.naver.com/api/stock/${ticker}/basic`;
+
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)',
+    },
+  });
 
   if (!response.ok) {
-    throw new Error(`HTTP error: ${response.status}`);
+    throw new Error(`NAVER API error: ${response.status}`);
   }
 
-  const html = await response.text();
+  const data = (await response.json()) as NaverBasicResponse;
 
-  // Parse price from HTML
-  // Looking for pattern like: <dd class="no_today"><span>37,250</span>
-  const priceMatch = html.match(/<dd class="no_today">\s*<span[^>]*>([0-9,]+)/);
-
-  if (!priceMatch) {
-    throw new Error('Price not found in response');
+  if (!data.closePrice) {
+    throw new Error('Price not found in NAVER response');
   }
 
-  const priceStr = priceMatch[1].replace(/,/g, '');
+  // Remove commas and parse
+  const priceStr = data.closePrice.replace(/,/g, '');
   const price = parseInt(priceStr, 10);
 
   if (isNaN(price) || price <= 0) {
-    throw new Error(`Invalid price parsed: ${priceStr}`);
+    throw new Error(`Invalid price parsed: ${data.closePrice}`);
   }
 
   return price;
@@ -61,7 +66,7 @@ async function fetchUSPrice(ticker: string): Promise<number> {
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error: ${response.status}`);
+    throw new Error(`Yahoo API error: ${response.status}`);
   }
 
   const data = await response.json() as {
@@ -127,13 +132,14 @@ export async function fetchPricesWithMarket(
     try {
       const data = await fetchPrice(ticker, market);
       prices[ticker] = data.price;
+      logger.info('Fetched price', { ticker, market, price: data.price });
     } catch (error) {
       logger.error('Failed to fetch price for ticker', {
         ticker,
         market,
         error: error instanceof Error ? error.message : String(error),
       });
-      throw new Error(`Failed to fetch price for ${ticker} (${market})`);
+      throw new Error(`${ticker} (${market}) 가격 조회 실패`);
     }
 
     // Small delay between requests
