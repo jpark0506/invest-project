@@ -109,9 +109,13 @@ export function SettingsPage() {
               triggerScheduler.mutate(
                 { dryRun },
                 {
-                  onSuccess: () => {
-                    toast.success(t('settings.scheduler.success'));
-                    if (!dryRun) {
+                  onSuccess: (response) => {
+                    if (response.ok) {
+                      toast.success(response.message);
+                    } else {
+                      toast.error(response.message);
+                    }
+                    if (!dryRun && response.ok) {
                       queryClient.invalidateQueries({ queryKey: ['executions'] });
                     }
                   },

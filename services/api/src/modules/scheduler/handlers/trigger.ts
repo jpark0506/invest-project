@@ -10,6 +10,7 @@ import { processPlanForUser } from '../service';
 
 interface TriggerRequest {
   dryRun?: boolean;
+  force?: boolean; // Skip date check - always generate for next cycle
 }
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -22,16 +23,26 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     const body: TriggerRequest = event.body ? JSON.parse(event.body) : {};
     const dryRun = body.dryRun ?? false;
+    const force = body.force ?? true; // Default to force for manual trigger
 
-    logger.info('Manual scheduler trigger', { userId, dryRun });
+    logger.info('Manual scheduler trigger', { userId, dryRun, force });
 
-    const result = await processPlanForUser(userId, dryRun);
+    const result = await processPlanForUser(userId, { dryRun, force });
 
-    if (!result.success) {
-      return errors.validation(result.error?.message || 'Failed to process plan');
-    }
-
-    return success({ ok: true, dryRun });
+    // Return detailed response
+    return success({
+      ok: result.success,
+      status: result.status,
+      message: result.message,
+      dryRun,
+      execution: result.execution ? {
+        ymCycle: result.execution.ymCycle,
+        yearMonth: result.execution.yearMonth,
+        cycleIndex: result.execution.cycleIndex,
+        cycleBudget: result.execution.cycleBudget,
+        itemCount: result.execution.items.length,
+      } : null,
+    });
   } catch (error) {
     if (error instanceof Error && error.name === 'UnauthorizedError') {
       return errors.unauthorized(error.message);
