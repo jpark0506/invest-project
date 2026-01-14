@@ -14,6 +14,12 @@ export const config = {
     authTokens: process.env.DYNAMODB_AUTH_TOKENS_TABLE || 'invest-assist-auth-tokens-dev',
     refreshTokens: process.env.DYNAMODB_REFRESH_TOKENS_TABLE || 'invest-assist-refresh-tokens-dev',
     notificationLogs: process.env.DYNAMODB_NOTIFICATION_LOGS_TABLE || 'invest-assist-notification-logs-dev',
+    tickerCache: process.env.DYNAMODB_TICKER_CACHE_TABLE || 'invest-assist-ticker-cache-dev',
+  },
+
+  // SQS
+  sqs: {
+    tickerFetchQueueUrl: process.env.SQS_TICKER_FETCH_QUEUE_URL || '',
   },
 
   // JWT

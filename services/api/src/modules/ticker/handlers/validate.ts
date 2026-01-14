@@ -51,7 +51,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     const formatValid = validateTickerFormat(ticker, market);
-    const knownTicker = isKnownTicker(ticker, market);
+    const knownTicker = await isKnownTicker(ticker, market);
 
     const response: ValidateResponse = {
       valid: formatValid,

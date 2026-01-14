@@ -19,6 +19,8 @@ Globals:
         DYNAMODB_AUTH_TOKENS_TABLE: !Ref AuthTokensTable
         DYNAMODB_REFRESH_TOKENS_TABLE: !Ref RefreshTokensTable
         DYNAMODB_NOTIFICATION_LOGS_TABLE: !Ref NotificationLogsTable
+        DYNAMODB_TICKER_CACHE_TABLE: !Ref TickerCacheTable
+        SQS_TICKER_FETCH_QUEUE_URL: !Ref TickerFetchQueue
         JWT_SECRET_ARN: !Ref JwtSecretArn
         SES_FROM_EMAIL: !Ref SesFromEmail
         APP_URL: !Ref AppUrl
@@ -85,6 +87,8 @@ Resources:
                   - dynamodb:DeleteItem
                   - dynamodb:Query
                   - dynamodb:Scan
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
                 Resource:
                   - !GetAtt UsersTable.Arn
                   - !Sub ${UsersTable.Arn}/index/*
@@ -95,6 +99,20 @@ Resources:
                   - !GetAtt RefreshTokensTable.Arn
                   - !Sub ${RefreshTokensTable.Arn}/index/*
                   - !GetAtt NotificationLogsTable.Arn
+                  - !GetAtt TickerCacheTable.Arn
+                  - !Sub ${TickerCacheTable.Arn}/index/*
+        - PolicyName: SQSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource:
+                  - !GetAtt TickerFetchQueue.Arn
         - PolicyName: SecretsManagerAccess
           PolicyDocument:
             Version: '2012-10-17'
@@ -631,6 +649,58 @@ Resources:
         External:
           - '@aws-sdk/*'
 
+  # SQS Worker for background ticker fetching
+  TickerFetchWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: fetchWorker.handler
+      CodeUri: src/modules/ticker/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt TickerFetchQueue.Arn
+            BatchSize: 10
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - fetchWorker.ts
+        External:
+          - '@aws-sdk/*'
+
+  # Scheduled function to refresh popular tickers
+  TickerCacheRefreshFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: refreshCache.handler
+      CodeUri: src/modules/ticker/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 300
+      MemorySize: 512
+      Events:
+        ScheduleRule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(6 hours)
+            Description: Refresh popular ticker cache every 6 hours
+            Enabled: true
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - refreshCache.ts
+        External:
+          - '@aws-sdk/*'
+
   # ========== DynamoDB Tables ==========
   UsersTable:
     Type: AWS::DynamoDB::Table
@@ -763,6 +833,48 @@ Resources:
           KeyType: HASH
         - AttributeName: sentAtType
           KeyType: RANGE
+
+  # Ticker cache table for storing fetched ticker data
+  TickerCacheTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub invest-assist-ticker-cache-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tickerMarket
+          AttributeType: S
+        - AttributeName: market
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tickerMarket
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: marketIndex
+          KeySchema:
+            - AttributeName: market
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  # ========== SQS Queues ==========
+  TickerFetchQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub invest-assist-ticker-fetch-${Environment}
+      VisibilityTimeout: 60
+      MessageRetentionPeriod: 86400
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt TickerFetchDLQ.Arn
+        maxReceiveCount: 3
+
+  TickerFetchDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub invest-assist-ticker-fetch-dlq-${Environment}
+      MessageRetentionPeriod: 1209600
 
 Outputs:
   ApiUrl:
