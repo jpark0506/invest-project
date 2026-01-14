@@ -111,9 +111,11 @@ export async function updatePortfolio(
   const expressionValues: Record<string, unknown> = {
     ':updatedAt': new Date().toISOString(),
   };
+  const expressionNames: Record<string, string> = {};
 
   if (input.name !== undefined) {
-    updateExpressions.push('name = :name');
+    updateExpressions.push('#name = :name');
+    expressionNames['#name'] = 'name';
     expressionValues[':name'] = input.name;
   }
   if (input.accountTypes !== undefined) {
@@ -143,6 +145,7 @@ export async function updatePortfolio(
       Key: { userId, portfolioId },
       UpdateExpression: 'SET ' + updateExpressions.join(', '),
       ExpressionAttributeValues: expressionValues,
+      ...(Object.keys(expressionNames).length > 0 && { ExpressionAttributeNames: expressionNames }),
     })
   );
 
