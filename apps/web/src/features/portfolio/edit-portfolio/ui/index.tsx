@@ -1,6 +1,6 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, Input, Button, TickerAutocomplete } from '@/shared/ui';
+import { Card, Input, Button, TickerSelectSheet } from '@/shared/ui';
 import { useHoldingsForm, HoldingFormData } from '../model';
 import type { Portfolio, Market } from '@invest-assist/core';
 import type { TickerInfo } from '@/entities/ticker';
@@ -14,6 +14,9 @@ interface EditPortfolioFormProps {
 
 export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }: EditPortfolioFormProps) {
   const { t } = useTranslation();
+  const [tickerSheetOpen, setTickerSheetOpen] = useState(false);
+  const [editingHoldingId, setEditingHoldingId] = useState<string | null>(null);
+
   const {
     holdings,
     addHolding,
@@ -31,7 +34,7 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
       resetHoldings(
         portfolio.holdings.map((h) => ({
           ...h,
-          targetWeight: h.targetWeight * 100, // convert to percentage
+          targetWeight: h.targetWeight * 100,
         }))
       );
     }
@@ -41,170 +44,187 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const name = formData.get('portfolioName') as string;
-    
+
     onSubmit({
-      name: name || portfolio?.name || 'My Portfolio',
+      name: name || portfolio?.name || '내 포트폴리오',
       holdings: toPortfolioHoldings(),
     });
   };
+
+  const handleAddHolding = useCallback(() => {
+    const newId = `holding-${Date.now()}`;
+    addHolding();
+    setEditingHoldingId(newId);
+    setTickerSheetOpen(true);
+  }, [addHolding]);
+
+  const handleTickerClick = useCallback((holdingId: string) => {
+    setEditingHoldingId(holdingId);
+    setTickerSheetOpen(true);
+  }, []);
+
+  const handleTickerSelect = useCallback((ticker: TickerInfo) => {
+    if (editingHoldingId) {
+      selectTicker(editingHoldingId, ticker);
+    }
+    setTickerSheetOpen(false);
+    setEditingHoldingId(null);
+  }, [editingHoldingId, selectTicker]);
 
   if (isLoading) {
     return (
       <Card>
         <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded" />
-          <div className="h-24 bg-gray-200 rounded" />
+          <div className="h-12 bg-gray-100 rounded-xl" />
+          <div className="h-32 bg-gray-100 rounded-xl" />
         </div>
       </Card>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Card>
-        <div className="space-y-6">
-          <Input
-            name="portfolioName"
-            label={t('settings.portfolio.name')}
-            placeholder="My Portfolio"
-            defaultValue={portfolio?.name || 'My Portfolio'}
-          />
+    <>
+      <form onSubmit={handleSubmit}>
+        <Card>
+          <div className="space-y-6">
+            {/* Portfolio Name */}
+            <Input
+              name="portfolioName"
+              label={t('settings.portfolio.name')}
+              placeholder="내 포트폴리오"
+              defaultValue={portfolio?.name || '내 포트폴리오'}
+            />
 
-          <div>
-            <label className="block text-text-secondary text-xs font-medium mb-3">
-              {t('settings.portfolio.holdings')}
-            </label>
-
-            <div className="space-y-3">
-              {holdings.map((holding) => (
-                <HoldingRow
-                  key={holding.id}
-                  holding={holding}
-                  onUpdate={updateHolding}
-                  onSelectTicker={selectTicker}
-                  onRemove={removeHolding}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between mt-4">
-              <Button
-                type="button"
-                variant="secondary"
-                size="md"
-                onClick={addHolding}
-              >
-                {t('settings.portfolio.addHolding')}
-              </Button>
-
-              <div className="text-sm">
-                <span className="text-text-secondary">{t('settings.portfolio.weightSum')}: </span>
-                <span
-                  className={`font-semibold ${
-                    Math.abs(totalWeight - 100) < 0.01
-                      ? 'text-success'
-                      : 'text-error'
-                  }`}
-                >
-                  {totalWeight.toFixed(1)}%
-                </span>
+            {/* Holdings Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-text-secondary text-xs font-medium">
+                  {t('settings.portfolio.holdings')}
+                </label>
+                <div className="text-sm">
+                  <span className="text-text-secondary">합계: </span>
+                  <span
+                    className={`font-semibold ${
+                      Math.abs(totalWeight - 100) < 0.01
+                        ? 'text-green-600'
+                        : 'text-orange-500'
+                    }`}
+                  >
+                    {totalWeight.toFixed(1)}%
+                  </span>
+                </div>
               </div>
+
+              {/* Holdings List */}
+              <div className="space-y-2">
+                {holdings.map((holding) => (
+                  <HoldingCard
+                    key={holding.id}
+                    holding={holding}
+                    onTickerClick={() => handleTickerClick(holding.id)}
+                    onWeightChange={(value) => updateHolding(holding.id, 'targetWeight', value)}
+                    onRemove={() => removeHolding(holding.id)}
+                  />
+                ))}
+              </div>
+
+              {/* Add Holding Button */}
+              <button
+                type="button"
+                onClick={handleAddHolding}
+                className="w-full mt-3 py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                종목 추가
+              </button>
             </div>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              fullWidth
+              disabled={!isValid || isPending}
+            >
+              {isPending ? t('common.loading') : t('common.save')}
+            </Button>
           </div>
+        </Card>
+      </form>
 
-          <Button
-            type="submit"
-            fullWidth
-            disabled={!isValid || isPending}
-          >
-            {isPending ? t('common.loading') : t('common.save')}
-          </Button>
-        </div>
-      </Card>
-    </form>
+      {/* Ticker Select Sheet */}
+      <TickerSelectSheet
+        isOpen={tickerSheetOpen}
+        onClose={() => {
+          setTickerSheetOpen(false);
+          setEditingHoldingId(null);
+        }}
+        onSelect={handleTickerSelect}
+      />
+    </>
   );
 }
 
-interface HoldingRowProps {
+interface HoldingCardProps {
   holding: HoldingFormData;
-  onUpdate: (id: string, field: keyof HoldingFormData, value: string | number) => void;
-  onSelectTicker: (id: string, ticker: TickerInfo) => void;
-  onRemove: (id: string) => void;
+  onTickerClick: () => void;
+  onWeightChange: (value: number) => void;
+  onRemove: () => void;
 }
 
-function HoldingRow({ holding, onUpdate, onSelectTicker, onRemove }: HoldingRowProps) {
-  const { t } = useTranslation();
-
-  const handleTickerSelect = useCallback(
-    (ticker: TickerInfo) => {
-      onSelectTicker(holding.id, ticker);
-    },
-    [holding.id, onSelectTicker]
-  );
+function HoldingCard({ holding, onTickerClick, onWeightChange, onRemove }: HoldingCardProps) {
+  const isEmpty = !holding.ticker;
 
   return (
-    <div className="grid grid-cols-12 gap-2 items-center p-3 bg-background rounded-lg">
-      <div className="col-span-3">
-        <TickerAutocomplete
-          value={holding.ticker}
-          onChange={(value) => onUpdate(holding.id, 'ticker', value)}
-          onSelect={handleTickerSelect}
-          market={holding.market}
-          placeholder={t('settings.portfolio.ticker')}
-        />
-      </div>
-      <div className="col-span-4">
-        <Input
-          placeholder={t('settings.portfolio.holdingName')}
-          value={holding.name}
-          onChange={(e) => onUpdate(holding.id, 'name', e.target.value)}
-          className="text-sm"
-        />
-      </div>
-      <div className="col-span-2">
-        <select
-          value={holding.market}
-          onChange={(e) => onUpdate(holding.id, 'market', e.target.value)}
-          className="input text-sm"
-        >
-          <option value="KRX">KRX</option>
-          <option value="KOSDAQ">KOSDAQ</option>
-          <option value="NYSE">NYSE</option>
-          <option value="NASDAQ">NASDAQ</option>
-        </select>
-      </div>
-      <div className="col-span-2">
-        <Input
-          type="number"
-          placeholder={t('settings.portfolio.weight')}
-          value={holding.targetWeight || ''}
-          onChange={(e) =>
-            onUpdate(holding.id, 'targetWeight', parseFloat(e.target.value) || 0)
-          }
-          className="text-sm text-right"
-          min={0}
-          max={100}
-          step={0.1}
-        />
-      </div>
-      <div className="col-span-1 flex justify-center">
+    <div className="bg-gray-50 rounded-xl p-4">
+      <div className="flex items-start gap-3">
+        {/* Ticker Info - Clickable */}
         <button
           type="button"
-          onClick={() => onRemove(holding.id)}
-          className="p-1.5 text-text-secondary hover:text-error transition-colors"
-          aria-label="Remove holding"
+          onClick={onTickerClick}
+          className="flex-1 text-left min-w-0"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
+          {isEmpty ? (
+            <div className="py-2">
+              <span className="text-gray-400">종목을 선택하세요</span>
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-text-primary">{holding.ticker}</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-600">
+                  {holding.market}
+                </span>
+              </div>
+              <p className="text-sm text-gray-500 truncate">{holding.name}</p>
+            </div>
+          )}
+        </button>
+
+        {/* Weight Input */}
+        <div className="flex items-center gap-2 shrink-0">
+          <input
+            type="number"
+            value={holding.targetWeight || ''}
+            onChange={(e) => onWeightChange(parseFloat(e.target.value) || 0)}
+            placeholder="0"
+            className="w-16 h-10 px-2 text-right text-lg font-semibold bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
+            min={0}
+            max={100}
+            step={0.1}
+          />
+          <span className="text-gray-500">%</span>
+        </div>
+
+        {/* Remove Button */}
+        <button
+          type="button"
+          onClick={onRemove}
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-400 hover:text-red-500 transition-colors shrink-0"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>

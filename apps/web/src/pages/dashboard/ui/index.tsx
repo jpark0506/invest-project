@@ -85,34 +85,44 @@ export function DashboardPage() {
 
   return (
     <Layout>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-text-primary">
-          {t('dashboard.title')}
-        </h2>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => setShowReport(true)}
-        >
-          {t('dashboard.viewReport')}
-        </Button>
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl font-bold text-text-primary">
+            {t('dashboard.title')}
+          </h2>
+          {executions.length > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowReport(true)}
+            >
+              {t('dashboard.viewReport')}
+            </Button>
+          )}
+        </div>
+        <p className="text-sm text-text-secondary">
+          {t('dashboard.subtitle')}
+        </p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <Card className="text-center">
-          <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.totalInvested')}</p>
-          <p className="text-lg font-bold text-primary">
-            {stats.totalBudget.toLocaleString()}원
-          </p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.executions')}</p>
-          <p className="text-lg font-bold text-text-primary">
-            {stats.confirmedCount}<span className="text-sm text-text-secondary">/{executions.length}</span>
-          </p>
-        </Card>
-      </div>
+      {/* Quick Stats - only show if there are executions */}
+      {executions.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Card className="text-center">
+            <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.totalInvested')}</p>
+            <p className="text-lg font-bold text-primary">
+              {stats.totalBudget.toLocaleString()}원
+            </p>
+          </Card>
+          <Card className="text-center">
+            <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.executions')}</p>
+            <p className="text-lg font-bold text-text-primary">
+              {stats.confirmedCount}<span className="text-sm text-text-secondary">/{executions.length}</span>
+            </p>
+          </Card>
+        </div>
+      )}
 
       <div className="space-y-3">
         {executions.map((execution) => (
@@ -151,7 +161,18 @@ export function DashboardPage() {
 
         {executions.length === 0 && (
           <Card className="text-center py-12">
-            <p className="text-text-secondary">{t('dashboard.noExecutions')}</p>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <p className="text-text-primary font-semibold mb-2">{t('dashboard.noExecutions')}</p>
+            <p className="text-sm text-text-secondary mb-6">{t('dashboard.noExecutionsHint')}</p>
+            <Link to="/settings">
+              <Button variant="primary" size="md">
+                {t('dashboard.goToSettings')}
+              </Button>
+            </Link>
           </Card>
         )}
       </div>

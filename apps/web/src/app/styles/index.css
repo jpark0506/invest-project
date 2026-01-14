@@ -16,11 +16,12 @@
 }
 
 @layer components {
-  /* Toss-style button */
+  /* Button base styles */
   .btn {
-    @apply inline-flex items-center justify-center rounded-[12px] font-semibold
+    @apply inline-flex items-center justify-center rounded-xl font-semibold
            transition-all duration-200 ease-in-out
-           focus:outline-none focus:ring-2 focus:ring-offset-2;
+           focus:outline-none focus:ring-2 focus:ring-offset-2
+           active:scale-[0.98];
   }
 
   .btn-primary {
@@ -30,40 +31,75 @@
   }
 
   .btn-secondary {
-    @apply btn bg-background text-text-primary
-           hover:bg-border active:bg-border-light
+    @apply btn bg-gray-100 text-text-primary border border-gray-200
+           hover:bg-gray-200 active:bg-gray-300
+           focus:ring-gray-300;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-500 text-white
+           hover:bg-red-600 active:bg-red-700
+           focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-text-secondary
+           hover:bg-gray-100 active:bg-gray-200
            focus:ring-gray-300;
   }
 
   .btn-lg {
-    @apply py-4 px-6 text-base;
+    @apply h-14 px-6 text-base;
   }
 
   .btn-md {
-    @apply py-3 px-5 text-sm;
+    @apply h-12 px-5 text-sm;
   }
 
   .btn-sm {
-    @apply py-2 px-4 text-xs;
+    @apply h-10 px-4 text-sm;
+  }
+
+  .btn-xs {
+    @apply h-8 px-3 text-xs;
   }
 
   .btn-full {
     @apply w-full;
   }
 
-  /* Toss-style input */
+  /* Icon button (round) */
+  .btn-icon {
+    @apply inline-flex items-center justify-center rounded-full
+           transition-all duration-200 ease-in-out
+           focus:outline-none active:scale-95;
+  }
+
+  .btn-icon-sm {
+    @apply btn-icon w-8 h-8;
+  }
+
+  .btn-icon-md {
+    @apply btn-icon w-10 h-10;
+  }
+
+  /* Input styles */
   .input {
-    @apply w-full h-[52px] px-4 rounded-[12px]
-           bg-background border border-transparent
+    @apply w-full h-12 px-4 rounded-xl
+           bg-gray-50 border border-gray-200
            text-text-primary text-base
            placeholder:text-text-tertiary
-           focus:outline-none focus:border-primary focus:bg-white
+           focus:outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20
            transition-all duration-200;
   }
 
-  /* Toss-style card */
+  .input-lg {
+    @apply h-14;
+  }
+
+  /* Card styles */
   .card {
-    @apply bg-surface rounded-lg p-5 shadow-card;
+    @apply bg-surface rounded-2xl p-5 shadow-card;
   }
 
   /* Toss-style section title */

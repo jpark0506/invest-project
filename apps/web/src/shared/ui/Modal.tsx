@@ -114,18 +114,14 @@ export function ConfirmModal({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 btn-secondary btn-md"
+            className="flex-1 btn btn-secondary btn-md"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className={`flex-1 btn-md ${
-              variant === 'danger'
-                ? 'bg-error text-white hover:bg-error/90'
-                : 'btn-primary'
-            }`}
+            className={`flex-1 btn btn-md ${variant === 'danger' ? 'btn-danger' : 'btn-primary'}`}
           >
             {isLoading ? '처리 중...' : confirmText}
           </button>

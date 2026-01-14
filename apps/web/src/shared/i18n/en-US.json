@@ -24,15 +24,19 @@
     "kakaoLogin": "Login with Kakao"
   },
   "nav": {
-    "dashboard": "Dashboard",
+    "dashboard": "Investment Plan",
     "settings": "Settings"
   },
   "dashboard": {
-    "title": "Order Sheets",
-    "noExecutions": "No order sheets this month",
+    "title": "Periodic Investment Plan",
+    "subtitle": "Automatically generates investment order sheets based on your schedule",
+    "noExecutions": "No order sheets generated yet",
+    "noExecutionsHint": "Set up your portfolio and investment plan in Settings first",
+    "goToSettings": "Go to Settings",
     "cycle": "Cycle {{index}}",
     "budget": "Budget",
     "viewReport": "Report",
+    "nextExecution": "Next Investment",
     "status": {
       "GENERATED": "Generated",
       "SENT": "Sent",
@@ -40,7 +44,8 @@
     },
     "stats": {
       "totalInvested": "Total Invested",
-      "executions": "Executions"
+      "executions": "Executions",
+      "monthlyBudget": "Monthly Budget"
     },
     "report": {
       "title": "Investment Report",

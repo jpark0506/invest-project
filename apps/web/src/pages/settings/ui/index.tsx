@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Layout, toast, CardSkeleton, LoadingWrapper, ConfirmModal } from '@/shared/ui';
+import { Layout, toast, CardSkeleton, LoadingWrapper, ConfirmModal, Button } from '@/shared/ui';
 import { usePortfolio, useUpdatePortfolio } from '@/entities/portfolio/model';
 import { usePlan, useUpdatePlan } from '@/entities/plan/model';
 import { useUserStore } from '@/entities/user/model';
@@ -136,12 +136,13 @@ export function SettingsPage() {
           <p className="text-sm text-text-secondary">
             {t('settings.account.description')}
           </p>
-          <button
+          <Button
+            variant="danger"
+            size="md"
             onClick={() => setShowDeleteConfirm(true)}
-            className="text-error text-sm font-medium hover:underline"
           >
             {t('settings.account.delete')}
-          </button>
+          </Button>
         </div>
       </section>
 

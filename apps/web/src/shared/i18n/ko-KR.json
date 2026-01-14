@@ -24,15 +24,19 @@
     "kakaoLogin": "카카오로 로그인"
   },
   "nav": {
-    "dashboard": "대시보드",
+    "dashboard": "투자 계획",
     "settings": "설정"
   },
   "dashboard": {
-    "title": "주문표",
-    "noExecutions": "이번 달 주문표가 없습니다",
+    "title": "정기 투자 계획",
+    "subtitle": "설정한 계획에 따라 주기적으로 투자 주문표를 생성합니다",
+    "noExecutions": "아직 생성된 주문표가 없습니다",
+    "noExecutionsHint": "설정에서 포트폴리오와 투자 계획을 먼저 설정해주세요",
+    "goToSettings": "설정하러 가기",
     "cycle": "{{index}}차",
     "budget": "예산",
     "viewReport": "보고서",
+    "nextExecution": "다음 투자일",
     "status": {
       "GENERATED": "생성됨",
       "SENT": "발송됨",
@@ -40,7 +44,8 @@
     },
     "stats": {
       "totalInvested": "총 투자금액",
-      "executions": "실행 현황"
+      "executions": "실행 현황",
+      "monthlyBudget": "월 예산"
     },
     "report": {
       "title": "투자 보고서",
