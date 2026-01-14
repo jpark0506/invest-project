@@ -1,4 +1,5 @@
 export { Button } from './Button';
+export { Loader } from './Loader';
 export { Input } from './Input';
 export { Card } from './Card';
 export { Layout } from './Layout';

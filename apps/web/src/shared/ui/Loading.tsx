@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Loader } from './Loader';
 
 /**
  * Full page loading spinner
@@ -6,7 +7,7 @@ import { ReactNode } from 'react';
 export function PageLoader() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <Loader size="lg" />
     </div>
   );
 }
@@ -17,7 +18,7 @@ export function PageLoader() {
 export function SectionLoader({ className = '' }: { className?: string }) {
   return (
     <div className={`flex items-center justify-center py-8 ${className}`}>
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+      <Loader size="md" />
     </div>
   );
 }
@@ -117,7 +118,7 @@ export function ErrorFallback({
       {resetErrorBoundary && (
         <button
           onClick={resetErrorBoundary}
-          className="btn-secondary btn-sm"
+          className="btn btn-secondary btn-sm"
         >
           다시 시도
         </button>

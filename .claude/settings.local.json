@@ -27,7 +27,10 @@
       "Bash(git merge:*)",
       "Bash(git stash:*)",
       "Bash(git stash pop:*)",
-      "Bash(gh run watch:*)"
+      "Bash(gh run watch:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm add:*)"
     ]
   }
 }

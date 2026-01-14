@@ -164,4 +164,61 @@
   .animate-fade-in {
     animation: fade-in 0.2s ease-out;
   }
+
+  /* Loader animations */
+  @keyframes pulse-grow {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
+  .animate-pulse-grow {
+    animation: pulse-grow 1.2s ease-in-out infinite;
+  }
+
+  @keyframes draw-line {
+    0% {
+      stroke-dashoffset: 30;
+    }
+    50% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 30;
+    }
+  }
+
+  .animate-draw-line {
+    stroke-dasharray: 30;
+    animation: draw-line 1.5s ease-in-out infinite;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-dot-1 {
+    animation: dot-pulse 1.2s ease-in-out infinite;
+    animation-delay: 0s;
+  }
+
+  .animate-dot-2 {
+    animation: dot-pulse 1.2s ease-in-out infinite;
+    animation-delay: 0.2s;
+  }
+
+  .animate-dot-3 {
+    animation: dot-pulse 1.2s ease-in-out infinite;
+    animation-delay: 0.4s;
+  }
 }

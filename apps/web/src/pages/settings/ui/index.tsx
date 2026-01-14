@@ -102,7 +102,9 @@ export function SettingsPage() {
               {t('settings.scheduler.dryRun')}
             </label>
           </div>
-          <button
+          <Button
+            fullWidth
+            loading={triggerScheduler.isPending}
             onClick={() =>
               triggerScheduler.mutate(
                 { dryRun },
@@ -119,13 +121,9 @@ export function SettingsPage() {
                 }
               )
             }
-            disabled={triggerScheduler.isPending}
-            className="btn-primary w-full"
           >
-            {triggerScheduler.isPending
-              ? t('common.loading')
-              : t('settings.scheduler.trigger')}
-          </button>
+            {t('settings.scheduler.trigger')}
+          </Button>
         </div>
       </section>
 

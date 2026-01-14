@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { userApi, type InvestmentStyle } from '@/entities/user/api';
 import { useUserStore } from '@/entities/user/model';
-import { toast, Checkbox } from '@/shared/ui';
+import { toast, Checkbox, Button } from '@/shared/ui';
 
 type Step = 'privacy' | 'marketing' | 'profile';
 
@@ -122,13 +122,13 @@ export function OnboardingPage() {
                 label={t('onboarding.privacy.consent')}
               />
 
-              <button
+              <Button
+                fullWidth
                 onClick={handleNext}
                 disabled={!privacyConsent}
-                className="btn-primary w-full"
               >
                 {t('common.confirm')}
-              </button>
+              </Button>
             </div>
           )}
 
@@ -149,9 +149,9 @@ export function OnboardingPage() {
                 label={t('onboarding.marketing.consent')}
               />
 
-              <button onClick={handleNext} className="btn-primary w-full">
+              <Button fullWidth onClick={handleNext}>
                 {t('common.confirm')}
-              </button>
+              </Button>
             </div>
           )}
 
@@ -172,7 +172,7 @@ export function OnboardingPage() {
                     <button
                       key={style}
                       onClick={() => setInvestmentStyle(style)}
-                      className={`w-full p-4 text-left rounded-lg border transition-colors ${
+                      className={`w-full p-4 text-left rounded-xl border-2 transition-colors ${
                         investmentStyle === style
                           ? 'border-primary bg-primary/5'
                           : 'border-border hover:border-primary/50'
@@ -190,20 +190,22 @@ export function OnboardingPage() {
               </div>
 
               <div className="flex gap-3">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={handleSkip}
-                  disabled={completeOnboarding.isPending}
-                  className="flex-1 btn-secondary"
+                  loading={completeOnboarding.isPending}
+                  className="flex-1"
                 >
                   {t('common.skip')}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleSubmit}
-                  disabled={completeOnboarding.isPending || !investmentStyle}
-                  className="flex-1 btn-primary"
+                  disabled={!investmentStyle}
+                  loading={completeOnboarding.isPending}
+                  className="flex-1"
                 >
-                  {completeOnboarding.isPending ? t('common.loading') : t('common.confirm')}
-                </button>
+                  {t('common.confirm')}
+                </Button>
               </div>
             </div>
           )}
