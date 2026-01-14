@@ -29,19 +29,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     const result = await processPlanForUser(userId, { dryRun, force });
 
-    // Return detailed response
+    // Return detailed response with full execution for preview
     return success({
       ok: result.success,
       status: result.status,
       message: result.message,
       dryRun,
-      execution: result.execution ? {
-        ymCycle: result.execution.ymCycle,
-        yearMonth: result.execution.yearMonth,
-        cycleIndex: result.execution.cycleIndex,
-        cycleBudget: result.execution.cycleBudget,
-        itemCount: result.execution.items.length,
-      } : null,
+      execution: result.execution ?? null,
     });
   } catch (error) {
     if (error instanceof Error && error.name === 'UnauthorizedError') {
