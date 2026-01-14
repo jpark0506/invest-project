@@ -606,6 +606,31 @@ Resources:
         External:
           - '@aws-sdk/*'
 
+  TickerValidateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: validate.handler
+      CodeUri: src/modules/ticker/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 5
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /tickers/validate
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - validate.ts
+        External:
+          - '@aws-sdk/*'
+
   # ========== DynamoDB Tables ==========
   UsersTable:
     Type: AWS::DynamoDB::Table
