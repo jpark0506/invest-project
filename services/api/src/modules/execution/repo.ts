@@ -20,9 +20,11 @@ export async function getExecutionsByMonth(
     new QueryCommand({
       TableName: tableName,
       KeyConditionExpression: 'userId = :userId AND begins_with(ymCycle, :yearMonth)',
+      FilterExpression: 'attribute_not_exists(deletedAt) OR deletedAt = :null',
       ExpressionAttributeValues: {
         ':userId': userId,
         ':yearMonth': yearMonth,
+        ':null': null,
       },
     })
   );
@@ -52,7 +54,14 @@ export async function getExecution(userId: string, ymCycle: string): Promise<Exe
     })
   );
 
-  return (result.Item as Execution) || null;
+  const item = result.Item as Execution | undefined;
+
+  // Return null if not found or soft-deleted
+  if (!item || item.deletedAt) {
+    return null;
+  }
+
+  return item;
 }
 
 /**
@@ -63,6 +72,23 @@ export async function saveExecution(execution: Execution): Promise<void> {
     new PutCommand({
       TableName: tableName,
       Item: execution,
+    })
+  );
+}
+
+/**
+ * Soft delete execution
+ */
+export async function softDeleteExecution(userId: string, ymCycle: string): Promise<void> {
+  await docClient.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: { userId, ymCycle },
+      UpdateExpression: 'SET deletedAt = :deletedAt, updatedAt = :updatedAt',
+      ExpressionAttributeValues: {
+        ':deletedAt': new Date().toISOString(),
+        ':updatedAt': new Date().toISOString(),
+      },
     })
   );
 }

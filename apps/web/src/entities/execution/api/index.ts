@@ -15,6 +15,11 @@ export interface ConfirmExecutionResponse {
   execution: Execution;
 }
 
+export interface DeleteExecutionResponse {
+  ok: boolean;
+  message: string;
+}
+
 export const executionApi = {
   list: (yearMonth?: string) => {
     const params = yearMonth ? `?ym=${yearMonth}` : '';
@@ -29,5 +34,10 @@ export const executionApi = {
   confirm: (ymCycle: string, data: ConfirmExecutionInput) => {
     const encoded = encodeURIComponent(ymCycle);
     return apiClient.post<ConfirmExecutionResponse>(`/executions/${encoded}/confirm`, data);
+  },
+
+  delete: (ymCycle: string) => {
+    const encoded = encodeURIComponent(ymCycle);
+    return apiClient.delete<DeleteExecutionResponse>(`/executions/${encoded}`);
   },
 };

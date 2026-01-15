@@ -15,6 +15,15 @@ const ExecutionPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('@/pages/settings/ui').then((m) => ({ default: m.SettingsPage }))
 );
+const SettingsPortfolioPage = lazy(() =>
+  import('@/pages/settings-portfolio/ui').then((m) => ({ default: m.SettingsPortfolioPage }))
+);
+const SettingsPlanPage = lazy(() =>
+  import('@/pages/settings-plan/ui').then((m) => ({ default: m.SettingsPlanPage }))
+);
+const SettingsAccountPage = lazy(() =>
+  import('@/pages/settings-account/ui').then((m) => ({ default: m.SettingsAccountPage }))
+);
 const LoginPage = lazy(() =>
   import('@/features/auth/login-by-email/ui').then((m) => ({ default: m.LoginPage }))
 );
@@ -65,6 +74,30 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings/portfolio"
+          element={
+            <ProtectedRoute>
+              <SettingsPortfolioPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings/plan"
+          element={
+            <ProtectedRoute>
+              <SettingsPlanPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings/account"
+          element={
+            <ProtectedRoute>
+              <SettingsAccountPage />
             </ProtectedRoute>
           }
         />

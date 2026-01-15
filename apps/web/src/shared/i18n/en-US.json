@@ -81,12 +81,18 @@
     "confirmNotePlaceholder": "Add execution details or notes",
     "confirmed": "Confirmed",
     "totalEstCost": "Total Est. Cost",
-    "totalCarryOut": "Total Carry"
+    "totalCarryOut": "Total Carry",
+    "delete": "Delete Order Sheet",
+    "deleteTitle": "Delete Order Sheet",
+    "deleteMessage": "Are you sure you want to delete this order sheet? You can regenerate it by running the scheduler again.",
+    "deleteConfirm": "Delete",
+    "deleted": "Order sheet deleted successfully"
   },
   "settings": {
     "title": "Settings",
     "portfolio": {
       "title": "Portfolio",
+      "description": "Configure your investment holdings and weights",
       "name": "Portfolio Name",
       "holdings": "Holdings",
       "addHolding": "Add Holding",
@@ -97,6 +103,7 @@
     },
     "plan": {
       "title": "Investment Plan",
+      "description": "Set your budget and investment schedule",
       "monthlyBudget": "Monthly Budget",
       "cycleCount": "Cycles",
       "cycleWeights": "Cycle Weights",
@@ -113,7 +120,12 @@
     },
     "account": {
       "title": "Account",
-      "description": "Deleting your account will permanently remove all your data.",
+      "description": "Manage your account settings",
+      "info": "Account Information",
+      "email": "Email",
+      "name": "Name",
+      "dangerZone": "Danger Zone",
+      "deleteDescription": "Deleting your account will permanently remove all your data.",
       "delete": "Delete Account",
       "confirmMessage": "Are you sure you want to delete your account? This action cannot be undone.",
       "confirmDelete": "Delete",

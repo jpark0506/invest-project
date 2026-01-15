@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Layout, Card, Button, SectionLoader, ErrorFallback, Modal } from '@/shared/ui';
 import { useExecutions } from '@/entities/execution/model';
+import { SchedulerTriggerSheet } from '@/features/scheduler/trigger-scheduler/ui/SchedulerTriggerSheet';
 
 interface StatsData {
   totalBudget: number;
@@ -15,6 +16,7 @@ export function DashboardPage() {
   const { t } = useTranslation();
   const { data, isLoading, error } = useExecutions();
   const [showReport, setShowReport] = useState(false);
+  const [showScheduler, setShowScheduler] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -91,15 +93,26 @@ export function DashboardPage() {
           <h2 className="text-xl font-bold text-text-primary">
             {t('dashboard.title')}
           </h2>
-          {executions.length > 0 && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setShowReport(true)}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowScheduler(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+              title={t('settings.scheduler.title')}
             >
-              {t('dashboard.viewReport')}
-            </Button>
-          )}
+              <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            {executions.length > 0 && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowReport(true)}
+              >
+                {t('dashboard.viewReport')}
+              </Button>
+            )}
+          </div>
         </div>
         <p className="text-sm text-text-secondary">
           {t('dashboard.subtitle')}
@@ -229,6 +242,11 @@ export function DashboardPage() {
           </section>
         </div>
       </Modal>
+
+      <SchedulerTriggerSheet
+        isOpen={showScheduler}
+        onClose={() => setShowScheduler(false)}
+      />
     </Layout>
   );
 }

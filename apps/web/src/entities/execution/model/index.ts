@@ -28,3 +28,15 @@ export function useConfirmExecution() {
     },
   });
 }
+
+export function useDeleteExecution() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ymCycle: string) => executionApi.delete(ymCycle),
+    onSuccess: (_, ymCycle) => {
+      queryClient.invalidateQueries({ queryKey: ['execution', ymCycle] });
+      queryClient.invalidateQueries({ queryKey: ['executions'] });
+    },
+  });
+}

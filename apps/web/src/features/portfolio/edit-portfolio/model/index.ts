@@ -30,6 +30,16 @@ export function useHoldingsForm(initialHoldings: PortfolioHolding[] = []) {
     ]);
   }, []);
 
+  const addHoldingWithData = useCallback((data: Omit<HoldingFormData, 'id'>) => {
+    setHoldings((prev) => [
+      ...prev,
+      {
+        id: `holding-${Date.now()}`,
+        ...data,
+      },
+    ]);
+  }, []);
+
   const removeHolding = useCallback((id: string) => {
     setHoldings((prev) => prev.filter((h) => h.id !== id));
   }, []);
@@ -83,6 +93,7 @@ export function useHoldingsForm(initialHoldings: PortfolioHolding[] = []) {
   return {
     holdings,
     addHolding,
+    addHoldingWithData,
     removeHolding,
     updateHolding,
     selectTicker,

@@ -546,6 +546,30 @@ Resources:
         External:
           - '@aws-sdk/*'
 
+  DeleteExecutionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: delete.handler
+      CodeUri: src/modules/execution/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /executions/{ymCycle}
+            Method: DELETE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - delete.ts
+        External:
+          - '@aws-sdk/*'
+
   # ========== Scheduler Function ==========
   SchedulerFunction:
     Type: AWS::Serverless::Function

@@ -19,7 +19,7 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
 
   const {
     holdings,
-    addHolding,
+    addHoldingWithData,
     removeHolding,
     updateHolding,
     selectTicker,
@@ -52,24 +52,32 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
   };
 
   const handleAddHolding = useCallback(() => {
-    const newId = `holding-${Date.now()}`;
-    addHolding();
-    setEditingHoldingId(newId);
+    setEditingHoldingId(null);
     setTickerSheetOpen(true);
-  }, [addHolding]);
+  }, []);
 
   const handleTickerClick = useCallback((holdingId: string) => {
     setEditingHoldingId(holdingId);
     setTickerSheetOpen(true);
   }, []);
 
-  const handleTickerSelect = useCallback((ticker: TickerInfo) => {
+  const handleTickerSelect = useCallback((ticker: TickerInfo, weight: number) => {
     if (editingHoldingId) {
+      // Editing existing holding
       selectTicker(editingHoldingId, ticker);
+      updateHolding(editingHoldingId, 'targetWeight', weight);
+    } else {
+      // Adding new holding with ticker and weight
+      addHoldingWithData({
+        ticker: ticker.ticker,
+        name: ticker.name,
+        market: ticker.market,
+        targetWeight: weight,
+      });
     }
     setTickerSheetOpen(false);
     setEditingHoldingId(null);
-  }, [editingHoldingId, selectTicker]);
+  }, [editingHoldingId, selectTicker, updateHolding, addHoldingWithData]);
 
   if (isLoading) {
     return (
@@ -161,6 +169,7 @@ export function EditPortfolioForm({ portfolio, isLoading, onSubmit, isPending }:
           setEditingHoldingId(null);
         }}
         onSelect={handleTickerSelect}
+        existingTickers={holdings.map((h) => h.ticker).filter(Boolean)}
       />
     </>
   );

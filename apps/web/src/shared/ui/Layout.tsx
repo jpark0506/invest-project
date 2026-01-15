@@ -6,6 +6,9 @@ import { useUserStore } from '@/entities/user/model';
 
 interface LayoutProps {
   children: ReactNode;
+  hideBottomNav?: boolean;
+  showBackButton?: boolean;
+  title?: string;
 }
 
 function DashboardIcon({ className }: { className?: string }) {
@@ -25,7 +28,15 @@ function SettingsIcon({ className }: { className?: string }) {
   );
 }
 
-export function Layout({ children }: LayoutProps) {
+function BackIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  );
+}
+
+export function Layout({ children, hideBottomNav, showBackButton, title }: LayoutProps) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,47 +53,68 @@ export function Layout({ children }: LayoutProps) {
     navigate('/login');
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-surface border-b border-border sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <img src="/favicon.svg" alt="Logo" className="w-7 h-7" />
-            <span className="text-lg font-bold text-text-primary">Invest Assist</span>
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="btn btn-ghost btn-sm text-text-secondary"
-          >
-            {t('auth.logout')}
-          </button>
+          {showBackButton ? (
+            <>
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1 text-text-primary hover:text-primary transition-colors"
+              >
+                <BackIcon className="w-6 h-6" />
+              </button>
+              <span className="text-lg font-bold text-text-primary">{title}</span>
+              <div className="w-6" /> {/* Spacer for alignment */}
+            </>
+          ) : (
+            <>
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <img src="/favicon.svg" alt="Logo" className="w-7 h-7" />
+                <span className="text-lg font-bold text-text-primary">Invest Assist</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="btn btn-ghost btn-sm text-text-secondary"
+              >
+                {t('auth.logout')}
+              </button>
+            </>
+          )}
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-lg mx-auto px-4 py-6 pb-24">{children}</main>
+      <main className={`max-w-lg mx-auto px-4 py-6 ${hideBottomNav ? '' : 'pb-24'}`}>{children}</main>
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border pb-safe">
-        <div className="max-w-lg mx-auto flex">
-          {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex-1 flex flex-col items-center py-3 transition-colors ${
-                  isActive ? 'text-primary' : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                <item.Icon className="w-6 h-6 mb-1" />
-                <span className="text-2xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      {!hideBottomNav && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border pb-safe">
+          <div className="max-w-lg mx-auto flex">
+            {navItems.map((item) => {
+              const isActive = location.pathname.startsWith(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex-1 flex flex-col items-center py-3 transition-colors ${
+                    isActive ? 'text-primary' : 'text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  <item.Icon className="w-6 h-6 mb-1" />
+                  <span className="text-2xs font-medium">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </div>
   );
 }

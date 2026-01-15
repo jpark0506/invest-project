@@ -66,6 +66,7 @@ export interface Execution {
   userConfirm: UserConfirm;
   createdAt: string; // ISO
   updatedAt: string; // ISO
+  deletedAt?: string | null; // ISO, soft delete timestamp
 }
 
 /** Execution summary for list view */

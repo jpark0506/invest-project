@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Layout, Card, Button, Input } from '@/shared/ui';
-import { useExecutionDetail, useConfirmExecution } from '@/entities/execution/model';
+import { Layout, Card, Button, Input, ConfirmModal, toast } from '@/shared/ui';
+import { useExecutionDetail, useConfirmExecution, useDeleteExecution } from '@/entities/execution/model';
 import type { ExecutionItemRecord } from '@invest-assist/core';
 
 export function ExecutionPage() {
@@ -11,10 +11,12 @@ export function ExecutionPage() {
   const { t } = useTranslation();
   const [note, setNote] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const decodedYmCycle = ymCycle ? decodeURIComponent(ymCycle) : '';
   const { data, isLoading, error } = useExecutionDetail(decodedYmCycle);
   const confirmMutation = useConfirmExecution();
+  const deleteMutation = useDeleteExecution();
 
   const execution = data?.execution;
 
@@ -40,6 +42,18 @@ export function ExecutionPage() {
       setShowConfirmModal(false);
     } catch (error) {
       // Error handled by mutation
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!decodedYmCycle) return;
+
+    try {
+      await deleteMutation.mutateAsync(decodedYmCycle);
+      toast.success(t('execution.deleted'));
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error(t('common.error'));
     }
   };
 
@@ -156,11 +170,20 @@ export function ExecutionPage() {
         </table>
       </Card>
 
-      {/* Confirm Button */}
+      {/* Action Buttons */}
       {execution.status !== 'CONFIRMED' ? (
-        <Button fullWidth onClick={() => setShowConfirmModal(true)}>
-          {t('execution.confirm')}
-        </Button>
+        <div className="space-y-3">
+          <Button fullWidth onClick={() => setShowConfirmModal(true)}>
+            {t('execution.confirm')}
+          </Button>
+          <Button
+            variant="danger"
+            fullWidth
+            onClick={() => setShowDeleteModal(true)}
+          >
+            {t('execution.delete')}
+          </Button>
+        </div>
       ) : (
         <div className="text-center py-4">
           <span className="inline-flex items-center gap-2 text-success font-medium">
@@ -209,6 +232,19 @@ export function ExecutionPage() {
           </Card>
         </div>
       )}
+
+      {/* Delete Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title={t('execution.deleteTitle')}
+        message={t('execution.deleteMessage')}
+        confirmText={t('execution.deleteConfirm')}
+        cancelText={t('common.cancel')}
+        isLoading={deleteMutation.isPending}
+        variant="danger"
+      />
     </Layout>
   );
 }
