@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { i18n } from '@/shared/i18n';
 import { ToastContainer } from '@/shared/ui';
 import { AppRoutes } from './routes';
@@ -25,6 +26,7 @@ export function App() {
             <AppRoutes />
             <ToastContainer />
             <Analytics />
+            <SpeedInsights />
           </AuthProvider>
         </BrowserRouter>
       </I18nextProvider>
