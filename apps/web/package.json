@@ -13,6 +13,7 @@
   "dependencies": {
     "@invest-assist/core": "workspace:*",
     "@tanstack/react-query": "^5.17.19",
+    "@vercel/analytics": "^1.6.1",
     "i18next": "^23.8.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
