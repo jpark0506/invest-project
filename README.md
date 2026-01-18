@@ -421,15 +421,6 @@ git push origin <branch-name>
 - PR 작성 후 코드 리뷰
 - CI 검증 통과 후 main에 merge
 
-### ⚠️ 자주 놓치는 실수
-
-| 실수 | 원인 | 해결책 |
-|------|------|--------|
-| 타입 에러로 빌드 실패 | 타입 체크 미실행 | 커밋 전 `pnpm typecheck` 실행 |
-| 사용하지 않는 변수 | `noUnusedLocals` 설정 | 제거 또는 `_variable` 접두사 사용 |
-| CORS 에러 | 응답에 CORS 헤더 미포함 | `createResponder()` 사용 |
-| 환경 변수 누락 | `.env` 미설정 | 각 서비스 `.env.example` 참고 |
-
 ---
 
 ## 배포
