@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { planApi, UpdatePlanInput } from '../api';
 
 export function usePlan() {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['plan'],
     queryFn: () => planApi.get(),
   });

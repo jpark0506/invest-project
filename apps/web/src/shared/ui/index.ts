@@ -19,3 +19,4 @@ export { Modal, ConfirmModal } from './Modal';
 export { BottomSheet } from './BottomSheet';
 export { TickerAutocomplete } from './TickerAutocomplete';
 export { TickerSelectSheet } from './TickerSelectSheet';
+export { QueryErrorBoundary } from './ErrorBoundary';

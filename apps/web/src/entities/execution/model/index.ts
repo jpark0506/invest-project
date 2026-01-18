@@ -1,18 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { executionApi, ConfirmExecutionInput } from '../api';
 
 export function useExecutions(yearMonth?: string) {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['executions', yearMonth],
     queryFn: () => executionApi.list(yearMonth),
   });
 }
 
 export function useExecutionDetail(ymCycle: string) {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['execution', ymCycle],
     queryFn: () => executionApi.getDetail(ymCycle),
-    enabled: !!ymCycle,
   });
 }
 

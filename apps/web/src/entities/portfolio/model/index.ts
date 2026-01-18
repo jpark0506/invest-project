@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { portfolioApi, UpdatePortfolioInput } from '../api';
 
 export function usePortfolio() {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['portfolio'],
     queryFn: () => portfolioApi.get(),
   });

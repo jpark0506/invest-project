@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Layout, Card, Button, SectionLoader, ErrorFallback, Modal } from '@/shared/ui';
+import { Layout, Card, Button, SectionLoader, Modal, QueryErrorBoundary } from '@/shared/ui';
 import { useExecutions } from '@/entities/execution/model';
 import { SchedulerTriggerSheet } from '@/features/scheduler/trigger-scheduler/ui/SchedulerTriggerSheet';
 
@@ -12,9 +12,9 @@ interface StatsData {
   monthlyStats: { month: string; budget: number; count: number }[];
 }
 
-export function DashboardPage() {
+function DashboardContent() {
   const { t } = useTranslation();
-  const { data, isLoading, error } = useExecutions();
+  const { data } = useExecutions();
   const [showReport, setShowReport] = useState(false);
   const [showScheduler, setShowScheduler] = useState(false);
 
@@ -69,24 +69,8 @@ export function DashboardPage() {
     };
   }, [executions]);
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <SectionLoader className="py-12" />
-      </Layout>
-    );
-  }
-
-  if (error) {
-    return (
-      <Layout>
-        <ErrorFallback message={t('common.error')} />
-      </Layout>
-    );
-  }
-
   return (
-    <Layout>
+    <>
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
@@ -247,6 +231,18 @@ export function DashboardPage() {
         isOpen={showScheduler}
         onClose={() => setShowScheduler(false)}
       />
+    </>
+  );
+}
+
+export function DashboardPage() {
+  return (
+    <Layout>
+      <QueryErrorBoundary>
+        <Suspense fallback={<SectionLoader className="py-12" />}>
+          <DashboardContent />
+        </Suspense>
+      </QueryErrorBoundary>
     </Layout>
   );
 }

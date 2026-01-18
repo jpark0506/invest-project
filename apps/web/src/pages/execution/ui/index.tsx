@@ -1,20 +1,19 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Layout, Card, Button, Input, ConfirmModal, toast } from '@/shared/ui';
+import { Layout, Card, Button, Input, ConfirmModal, toast, SectionLoader, QueryErrorBoundary } from '@/shared/ui';
 import { useExecutionDetail, useConfirmExecution, useDeleteExecution } from '@/entities/execution/model';
 import type { ExecutionItemRecord } from '@invest-assist/core';
 
-export function ExecutionPage() {
-  const { ymCycle } = useParams<{ ymCycle: string }>();
+function ExecutionContent({ ymCycle }: { ymCycle: string }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [note, setNote] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const decodedYmCycle = ymCycle ? decodeURIComponent(ymCycle) : '';
-  const { data, isLoading, error } = useExecutionDetail(decodedYmCycle);
+  const decodedYmCycle = decodeURIComponent(ymCycle);
+  const { data } = useExecutionDetail(decodedYmCycle);
   const confirmMutation = useConfirmExecution();
   const deleteMutation = useDeleteExecution();
 
@@ -40,7 +39,7 @@ export function ExecutionPage() {
         data: { note: note || undefined },
       });
       setShowConfirmModal(false);
-    } catch (error) {
+    } catch {
       // Error handled by mutation
     }
   };
@@ -52,31 +51,19 @@ export function ExecutionPage() {
       await deleteMutation.mutateAsync(decodedYmCycle);
       toast.success(t('execution.deleted'));
       navigate('/dashboard');
-    } catch (error) {
+    } catch {
       toast.error(t('common.error'));
     }
   };
 
-  if (isLoading) {
+  if (!execution) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-        </div>
-      </Layout>
-    );
-  }
-
-  if (error || !execution) {
-    return (
-      <Layout>
-        <Card className="text-center py-12">
-          <p className="text-error">{t('common.error')}</p>
-          <Button variant="secondary" className="mt-4" onClick={() => navigate('/dashboard')}>
-            {t('common.back')}
-          </Button>
-        </Card>
-      </Layout>
+      <Card className="text-center py-12">
+        <p className="text-error">{t('common.error')}</p>
+        <Button variant="secondary" className="mt-4" onClick={() => navigate('/dashboard')}>
+          {t('common.back')}
+        </Button>
+      </Card>
     );
   }
 
@@ -84,7 +71,7 @@ export function ExecutionPage() {
   const totalCarryOut = execution.items.reduce((sum: number, item: ExecutionItemRecord) => sum + item.carryOut, 0);
 
   return (
-    <Layout>
+    <>
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-text-primary">
@@ -245,6 +232,35 @@ export function ExecutionPage() {
         isLoading={deleteMutation.isPending}
         variant="danger"
       />
+    </>
+  );
+}
+
+export function ExecutionPage() {
+  const { ymCycle } = useParams<{ ymCycle: string }>();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  if (!ymCycle) {
+    return (
+      <Layout>
+        <Card className="text-center py-12">
+          <p className="text-error">{t('common.error')}</p>
+          <Button variant="secondary" className="mt-4" onClick={() => navigate('/dashboard')}>
+            {t('common.back')}
+          </Button>
+        </Card>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <QueryErrorBoundary>
+        <Suspense fallback={<SectionLoader className="py-12" />}>
+          <ExecutionContent ymCycle={ymCycle} />
+        </Suspense>
+      </QueryErrorBoundary>
     </Layout>
   );
 }
