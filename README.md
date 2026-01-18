@@ -62,7 +62,7 @@ graph TB
     
     CloudWatch["📝 CloudWatch Logs<br/>(감시 & 로깅)"]
     
-    User -->|HTTP(S)| Frontend
+    User -->|HTTP| Frontend
     Frontend -->|REST API| APIGateway
     
     APIGateway --> AuthLambda
