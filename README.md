@@ -30,9 +30,8 @@
 ### 대상 사용자
 
 - 장기 자산 배분 전략을 추구하는 개인 투자자
-- 정기적인 투자 규율을 유지하고 싶은 사용자
+- 정기적인 투자 습관을 만들고 싶은 사용자
 
----
 
 ## 아키텍처
 
@@ -475,7 +474,7 @@ sam deploy --guided
 
 ## 라이센스
 
-MIT License - 자유롭게 사용, 수정, 배포 가능
+MIT License
 
 ---
 
@@ -483,7 +482,7 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 - 🐛 버그 리포트: [GitHub Issues](https://github.com/yourusername/invest-project/issues)
 - 💬 토론: [GitHub Discussions](https://github.com/yourusername/invest-project/discussions)
-- 📧 이메일: your.email@example.com
+- 📧 이메일: junhyuk.park52@gmail.com
 
 ---
 
@@ -499,27 +498,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능
 
 기여 가이드: [CONTRIBUTING.md](./docs/contributing.md) (예정)
 
----
 
-## 로드맵
-
-### ✅ MVP (진행 중)
-- [x] 기본 인증
-- [x] 포트폴리오/플랜 설정
-- [x] 주문표 자동 생성
-- [ ] 알림 발송 (진행 중)
-- [ ] 주문 확인
-
-### 🔮 v0.2
-- [ ] 신호 고도화 (RSI + MA)
-- [ ] 텔레그램 알림
-- [ ] 가격 캐시 최적화
-
-### 🚀 v1.0
-- [ ] AI 코멘트 (온디맨드)
-- [ ] 리포트 스냅샷
-- [ ] 다국적 시장 지원
-
----
-
-**Happy Investing! 🚀**
