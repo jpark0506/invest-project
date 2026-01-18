@@ -21,6 +21,7 @@
     "@aws-sdk/client-ses": "^3.490.0",
     "@aws-sdk/client-sqs": "^3.968.0",
     "@aws-sdk/lib-dynamodb": "^3.490.0",
+    "@google/generative-ai": "^0.24.1",
     "@invest-assist/core": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

@@ -24,7 +24,8 @@
     "kakaoLogin": "Login with Kakao"
   },
   "nav": {
-    "dashboard": "Investment Plan",
+    "dashboard": "Home",
+    "insights": "Insights",
     "settings": "Settings"
   },
   "dashboard": {
@@ -163,11 +164,118 @@
           "description": "Accept higher risk for potentially higher returns"
         }
       }
+    },
+    "period": {
+      "title": "Investment Period",
+      "description": "Select your target investment period.",
+      "options": {
+        "3M": {
+          "title": "3 Months",
+          "description": "Short-term, quick profit realization"
+        },
+        "6M": {
+          "title": "6 Months",
+          "description": "Mid-term, balanced approach"
+        },
+        "1Y": {
+          "title": "1 Year",
+          "description": "Long-term, stable growth"
+        }
+      }
+    },
+    "amount": {
+      "title": "Investment Amount",
+      "description": "Enter the amount you plan to invest.",
+      "placeholder": "Enter amount",
+      "presets": {
+        "1m": "1M KRW",
+        "5m": "5M KRW",
+        "10m": "10M KRW",
+        "custom": "Custom"
+      }
+    },
+    "markets": {
+      "title": "Markets of Interest",
+      "description": "Select the markets you're interested in. Multiple selections allowed.",
+      "options": {
+        "KR": {
+          "title": "Korean Stocks",
+          "description": "KOSPI, KOSDAQ stocks"
+        },
+        "US": {
+          "title": "US Stocks",
+          "description": "S&P 500, NASDAQ stocks"
+        },
+        "CRYPTO": {
+          "title": "Crypto",
+          "description": "Bitcoin, Ethereum, etc."
+        },
+        "ETF": {
+          "title": "ETF",
+          "description": "Domestic and international ETFs"
+        }
+      }
     }
   },
   "format": {
     "currency": "{{value}} KRW",
     "shares": "{{value}} shares",
     "percent": "{{value}}%"
+  },
+  "ticker": {
+    "noResults": "No results found",
+    "searchPlaceholder": "Search tickers"
+  },
+  "insights": {
+    "title": "AI Insights",
+    "subtitle": "AI-powered investment analysis tools",
+    "portfolioBuilder": {
+      "title": "Portfolio Builder",
+      "description": "Get optimal asset allocation recommendations based on your profile",
+      "generate": "Generate",
+      "generating": "Analyzing...",
+      "allocation": "Asset Allocation",
+      "rationale": "Rationale",
+      "expectedReturn": "Expected Return",
+      "riskLevel": "Risk Level"
+    },
+    "riskSimulator": {
+      "title": "Risk Simulator",
+      "description": "Simulate portfolio changes under various market conditions",
+      "simulate": "Simulate",
+      "simulating": "Simulating...",
+      "scenarios": "Scenarios",
+      "currentValue": "Current Value",
+      "resultValue": "Result Value",
+      "change": "Change"
+    },
+    "exitGuide": {
+      "title": "Exit Guide",
+      "description": "Get optimal take-profit and stop-loss recommendations",
+      "analyze": "Analyze",
+      "analyzing": "Analyzing...",
+      "takeProfit": "Take Profit",
+      "stopLoss": "Stop Loss",
+      "currentStatus": "Current Status",
+      "strategy": "Strategy"
+    },
+    "rebalancing": {
+      "title": "Rebalancing Advisor",
+      "description": "Get rebalancing strategy recommendations for your portfolio",
+      "analyze": "Analyze",
+      "analyzing": "Analyzing...",
+      "actions": "Actions",
+      "buy": "Buy",
+      "sell": "Sell",
+      "hold": "Hold",
+      "urgency": "Urgency"
+    },
+    "quickActions": {
+      "title": "Quick Actions"
+    },
+    "rebalancingAlert": {
+      "title": "Rebalancing Needed",
+      "message": "{{count}} holdings need weight adjustment"
+    }
   }
 }

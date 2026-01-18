@@ -24,7 +24,8 @@
     "kakaoLogin": "카카오로 로그인"
   },
   "nav": {
-    "dashboard": "투자 계획",
+    "dashboard": "홈",
+    "insights": "인사이트",
     "settings": "설정"
   },
   "dashboard": {
@@ -167,6 +168,57 @@
           "description": "높은 수익을 위해 적극적인 위험을 감수합니다"
         }
       }
+    },
+    "period": {
+      "title": "투자 기간",
+      "description": "목표로 하는 투자 기간을 선택해 주세요.",
+      "options": {
+        "3M": {
+          "title": "3개월",
+          "description": "단기 투자, 빠른 수익 실현"
+        },
+        "6M": {
+          "title": "6개월",
+          "description": "중기 투자, 균형잡힌 접근"
+        },
+        "1Y": {
+          "title": "1년",
+          "description": "장기 투자, 안정적인 성장"
+        }
+      }
+    },
+    "amount": {
+      "title": "투자금",
+      "description": "투자하실 금액을 입력해 주세요.",
+      "placeholder": "금액 입력",
+      "presets": {
+        "1m": "100만원",
+        "5m": "500만원",
+        "10m": "1000만원",
+        "custom": "직접 입력"
+      }
+    },
+    "markets": {
+      "title": "관심 시장",
+      "description": "관심 있는 투자 시장을 선택해 주세요. 복수 선택 가능합니다.",
+      "options": {
+        "KR": {
+          "title": "한국 주식",
+          "description": "코스피, 코스닥 종목"
+        },
+        "US": {
+          "title": "미국 주식",
+          "description": "S&P 500, 나스닥 종목"
+        },
+        "CRYPTO": {
+          "title": "코인",
+          "description": "비트코인, 이더리움 등"
+        },
+        "ETF": {
+          "title": "ETF",
+          "description": "국내외 ETF 상품"
+        }
+      }
     }
   },
   "format": {
@@ -177,5 +229,57 @@
   "ticker": {
     "noResults": "검색 결과가 없습니다",
     "searchPlaceholder": "종목 검색"
+  },
+  "insights": {
+    "title": "AI 인사이트",
+    "subtitle": "AI 기반 투자 분석 도구",
+    "portfolioBuilder": {
+      "title": "포트폴리오 빌더",
+      "description": "투자 성향에 맞는 최적의 자산 배분을 추천받으세요",
+      "generate": "추천받기",
+      "generating": "분석 중...",
+      "allocation": "자산 배분",
+      "rationale": "추천 이유",
+      "expectedReturn": "예상 수익률",
+      "riskLevel": "위험도"
+    },
+    "riskSimulator": {
+      "title": "리스크 시뮬레이터",
+      "description": "다양한 시장 상황에서 포트폴리오 변화를 시뮬레이션합니다",
+      "simulate": "시뮬레이션",
+      "simulating": "시뮬레이션 중...",
+      "scenarios": "시나리오",
+      "currentValue": "현재 가치",
+      "resultValue": "결과 가치",
+      "change": "변동"
+    },
+    "exitGuide": {
+      "title": "익절/손절 가이드",
+      "description": "종목별 최적의 매도 타이밍을 알려드립니다",
+      "analyze": "분석하기",
+      "analyzing": "분석 중...",
+      "takeProfit": "익절 라인",
+      "stopLoss": "손절 라인",
+      "currentStatus": "현재 상태",
+      "strategy": "전략"
+    },
+    "rebalancing": {
+      "title": "리밸런싱 어드바이저",
+      "description": "현재 포트폴리오의 리밸런싱 전략을 추천합니다",
+      "analyze": "분석하기",
+      "analyzing": "분석 중...",
+      "actions": "조치 사항",
+      "buy": "매수",
+      "sell": "매도",
+      "hold": "유지",
+      "urgency": "긴급도"
+    },
+    "quickActions": {
+      "title": "빠른 액션"
+    },
+    "rebalancingAlert": {
+      "title": "리밸런싱 필요",
+      "message": "{{count}}개 종목의 비중 조정이 필요합니다"
+    }
   }
 }

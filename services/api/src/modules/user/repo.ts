@@ -171,6 +171,15 @@ export async function completeOnboarding(
         ...(request.profile.expectedMonthlyBudget && {
           expectedMonthlyBudget: request.profile.expectedMonthlyBudget,
         }),
+        ...(request.profile.investmentPeriod && {
+          investmentPeriod: request.profile.investmentPeriod,
+        }),
+        ...(request.profile.investmentAmount && {
+          investmentAmount: request.profile.investmentAmount,
+        }),
+        ...(request.profile.interestedMarkets && {
+          interestedMarkets: request.profile.interestedMarkets,
+        }),
       }
     : undefined;
 

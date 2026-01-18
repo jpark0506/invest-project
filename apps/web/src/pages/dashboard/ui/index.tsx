@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Layout, Card, Button, SectionLoader, Modal, QueryErrorBoundary } from '@/shared/ui';
 import { useExecutions } from '@/entities/execution/model';
 import { SchedulerTriggerSheet } from '@/features/scheduler/trigger-scheduler/ui/SchedulerTriggerSheet';
+import { PortfolioSummary } from './PortfolioSummary';
+import { QuickActionCards } from './QuickActionCards';
 
 interface StatsData {
   totalBudget: number;
@@ -71,56 +73,46 @@ function DashboardContent() {
 
   return (
     <>
-      {/* Header */}
+      {/* Portfolio Summary */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold text-text-primary">
-            {t('dashboard.title')}
-          </h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowScheduler(true)}
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-              title={t('settings.scheduler.title')}
-            >
-              <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
-            {executions.length > 0 && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowReport(true)}
-              >
-                {t('dashboard.viewReport')}
-              </Button>
-            )}
-          </div>
-        </div>
-        <p className="text-sm text-text-secondary">
-          {t('dashboard.subtitle')}
-        </p>
+        <PortfolioSummary
+          totalInvested={stats.totalBudget}
+          confirmedCount={stats.confirmedCount}
+          totalCount={executions.length}
+        />
       </div>
 
-      {/* Quick Stats - only show if there are executions */}
-      {executions.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="text-center">
-            <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.totalInvested')}</p>
-            <p className="text-lg font-bold text-primary">
-              {stats.totalBudget.toLocaleString()}원
-            </p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-xs text-text-secondary mb-1">{t('dashboard.stats.executions')}</p>
-            <p className="text-lg font-bold text-text-primary">
-              {stats.confirmedCount}<span className="text-sm text-text-secondary">/{executions.length}</span>
-            </p>
-          </Card>
-        </div>
-      )}
+      {/* Quick Actions */}
+      <QuickActionCards />
 
+      {/* Header for Executions */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold text-text-primary">
+          {t('dashboard.title')}
+        </h3>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowScheduler(true)}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            title={t('settings.scheduler.title')}
+          >
+            <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+          {executions.length > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowReport(true)}
+            >
+              {t('dashboard.viewReport')}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Execution List */}
       <div className="space-y-3">
         {executions.map((execution) => (
           <Link key={execution.ymCycle} to={`/execution/${encodeURIComponent(execution.ymCycle)}`}>

@@ -30,6 +30,21 @@ const LoginPage = lazy(() =>
 const OnboardingPage = lazy(() =>
   import('@/pages/onboarding/ui').then((m) => ({ default: m.OnboardingPage }))
 );
+const InsightsPage = lazy(() =>
+  import('@/pages/insights/ui').then((m) => ({ default: m.InsightsPage }))
+);
+const PortfolioBuilderPage = lazy(() =>
+  import('@/pages/insights/builder/ui').then((m) => ({ default: m.PortfolioBuilderPage }))
+);
+const RiskSimulatorPage = lazy(() =>
+  import('@/pages/insights/risk/ui').then((m) => ({ default: m.RiskSimulatorPage }))
+);
+const ExitGuidePage = lazy(() =>
+  import('@/pages/insights/exit-guide/ui').then((m) => ({ default: m.ExitGuidePage }))
+);
+const RebalancingPage = lazy(() =>
+  import('@/pages/insights/rebalancing/ui').then((m) => ({ default: m.RebalancingPage }))
+);
 
 export function AppRoutes() {
   return (
@@ -98,6 +113,46 @@ export function AppRoutes() {
           element={
             <ProtectedRoute>
               <SettingsAccountPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights"
+          element={
+            <ProtectedRoute>
+              <InsightsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights/builder"
+          element={
+            <ProtectedRoute>
+              <PortfolioBuilderPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights/risk"
+          element={
+            <ProtectedRoute>
+              <RiskSimulatorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights/exit-guide"
+          element={
+            <ProtectedRoute>
+              <ExitGuidePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/insights/rebalancing"
+          element={
+            <ProtectedRoute>
+              <RebalancingPage />
             </ProtectedRoute>
           }
         />

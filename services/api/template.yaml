@@ -27,6 +27,8 @@ Globals:
         API_URL: !Ref ApiUrl
         KAKAO_CLIENT_ID: !Ref KakaoClientId
         KAKAO_CLIENT_SECRET: !Ref KakaoClientSecret
+        GEMINI_API_KEY_ARN: !Ref GeminiApiKeyArn
+        AI_PROVIDER: gemini
 
 Parameters:
   Environment:
@@ -58,6 +60,13 @@ Parameters:
     Description: Kakao OAuth Client Secret
     NoEcho: true
     Default: ''
+  GeminiApiKeyArn:
+    Type: String
+    Description: ARN of the Gemini API key in Secrets Manager
+    Default: ''
+
+Conditions:
+  HasGeminiApiKey: !Not [!Equals [!Ref GeminiApiKeyArn, '']]
 
 Resources:
   # ========== Shared Lambda Role ==========
@@ -120,7 +129,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - secretsmanager:GetSecretValue
-                Resource: !Ref JwtSecretArn
+                Resource:
+                  - !Ref JwtSecretArn
+                  - !If [HasGeminiApiKey, !Ref GeminiApiKeyArn, !Ref 'AWS::NoValue']
         - PolicyName: SESAccess
           PolicyDocument:
             Version: '2012-10-17'
@@ -722,6 +733,111 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - refreshCache.ts
+        External:
+          - '@aws-sdk/*'
+
+  # ========== Insights Functions ==========
+  InsightsPortfolioBuilderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: portfolioBuilder.handler
+      CodeUri: src/modules/insights/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      MemorySize: 512
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /insights/portfolio-builder
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - portfolioBuilder.ts
+        External:
+          - '@aws-sdk/*'
+
+  InsightsRiskSimulationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: riskSimulation.handler
+      CodeUri: src/modules/insights/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      MemorySize: 512
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /insights/risk-simulation
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - riskSimulation.ts
+        External:
+          - '@aws-sdk/*'
+
+  InsightsExitGuideFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: exitGuide.handler
+      CodeUri: src/modules/insights/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      MemorySize: 512
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /insights/exit-guide
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - exitGuide.ts
+        External:
+          - '@aws-sdk/*'
+
+  InsightsRebalancingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: rebalancing.handler
+      CodeUri: src/modules/insights/handlers/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 60
+      MemorySize: 512
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /insights/rebalancing
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        Sourcemap: false
+        EntryPoints:
+          - rebalancing.ts
         External:
           - '@aws-sdk/*'
 

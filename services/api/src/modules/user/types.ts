@@ -3,6 +3,8 @@
  */
 
 export type InvestmentStyle = 'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE';
+export type InvestmentPeriod = '3M' | '6M' | '1Y';
+export type InterestedMarket = 'KR' | 'US' | 'CRYPTO' | 'ETF';
 
 export interface UserConsents {
   privacy: boolean;
@@ -14,6 +16,9 @@ export interface UserConsents {
 export interface UserProfile {
   investmentStyle?: InvestmentStyle;
   expectedMonthlyBudget?: number;
+  investmentPeriod?: InvestmentPeriod;
+  investmentAmount?: number;
+  interestedMarkets?: InterestedMarket[];
 }
 
 export type AuthProvider = 'email' | 'kakao';
@@ -56,5 +61,8 @@ export interface CompleteOnboardingRequest {
   profile?: {
     investmentStyle?: InvestmentStyle;
     expectedMonthlyBudget?: number;
+    investmentPeriod?: InvestmentPeriod;
+    investmentAmount?: number;
+    interestedMarkets?: InterestedMarket[];
   };
 }
