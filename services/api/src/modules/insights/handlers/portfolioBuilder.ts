@@ -8,8 +8,9 @@ import { logger } from '../../../shared/logger';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { generatePortfolioRecommendation } from '../service';
 import type { PortfolioBuilderRequest } from '../types';
+import { withSentry } from '../../../shared/sentry';
 
-export const handler: APIGatewayProxyHandler = async (event) => {
+const rawHandler: APIGatewayProxyHandler = async (event) => {
   const { success, errors } = createResponder(event);
 
   try {
@@ -52,3 +53,5 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return errors.internal('Failed to generate portfolio recommendation');
   }
 };
+
+export const handler = withSentry(rawHandler);

@@ -13,7 +13,6 @@ Globals:
       - arn:aws:lambda:ap-northeast-2:943013980633:layer:SentryNodeServerlessSDKv10:49
     Environment:
       Variables:
-        NODE_OPTIONS: "--import @sentry/aws-serverless/awslambda-auto"
         NODE_ENV: !Ref Environment
         DYNAMODB_USERS_TABLE: !Ref UsersTable
         DYNAMODB_PORTFOLIOS_TABLE: !Ref PortfoliosTable
@@ -193,7 +192,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -217,7 +216,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -241,7 +240,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -265,7 +264,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -289,7 +288,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -313,7 +312,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -338,7 +337,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -362,7 +361,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -386,7 +385,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -411,7 +410,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -435,7 +434,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -460,7 +459,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -484,7 +483,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -509,7 +508,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -533,7 +532,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -557,7 +556,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -581,7 +580,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -608,7 +607,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -633,7 +632,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -659,7 +658,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -684,7 +683,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -709,7 +708,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -736,7 +735,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -763,7 +762,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -789,7 +788,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -815,7 +814,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -841,7 +840,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: false
+        Minify: true
         Target: es2022
         Sourcemap: false
         EntryPoints:
