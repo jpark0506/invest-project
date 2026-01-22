@@ -19,3 +19,6 @@ Sentry.AWSLambda.init({
 export const withSentry = (handler: Handler) => {
   return Sentry.AWSLambda.wrapHandler(handler);
 };
+
+export const captureException = Sentry.captureException;
+

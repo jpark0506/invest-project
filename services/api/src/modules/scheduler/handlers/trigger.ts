@@ -7,7 +7,7 @@ import { createResponder } from '../../../shared/response';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { logger } from '../../../shared/logger';
 import { processPlanForUser } from '../service';
-import { withSentry } from '../../../shared/sentry';
+import { withSentry, captureException } from '../../../shared/sentry';
 
 interface TriggerRequest {
   dryRun?: boolean;
@@ -45,6 +45,9 @@ const rawHandler: APIGatewayProxyHandler = async (event) => {
 
     const message = error instanceof Error ? error.message : String(error);
     logger.error('Manual scheduler trigger failed', { error: message });
+    
+    // Report to Sentry
+    captureException(error);
 
     return errors.internal('Scheduler trigger failed');
   }

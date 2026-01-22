@@ -8,7 +8,7 @@ import { logger } from '../../../shared/logger';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { generatePortfolioRecommendation } from '../service';
 import type { PortfolioBuilderRequest } from '../types';
-import { withSentry } from '../../../shared/sentry';
+import { withSentry, captureException } from '../../../shared/sentry';
 
 const rawHandler: APIGatewayProxyHandler = async (event) => {
   const { success, errors } = createResponder(event);
@@ -45,6 +45,9 @@ const rawHandler: APIGatewayProxyHandler = async (event) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('Portfolio builder failed', { error: message });
+    
+    // Report to Sentry
+    captureException(error);
 
     if (error instanceof Error && error.name === 'UnauthorizedError') {
       return errors.unauthorized(message);
