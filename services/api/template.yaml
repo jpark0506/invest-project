@@ -31,6 +31,7 @@ Globals:
         KAKAO_CLIENT_SECRET: !Ref KakaoClientSecret
         GEMINI_API_KEY_ARN: !Ref GeminiApiKeyArn
         AI_PROVIDER: gemini
+        GEMINI_MODEL: gemini-3-pro-preview
         SENTRY_DSN: !Ref SentryDsn
 
 Parameters:
