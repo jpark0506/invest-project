@@ -22,6 +22,13 @@ import { handler as planPut } from './modules/plan/handlers/put';
 import { handler as executionList } from './modules/execution/handlers/list';
 import { handler as executionDetail } from './modules/execution/handlers/detail';
 import { handler as executionConfirm } from './modules/execution/handlers/confirm';
+import { handler as schedulerTrigger } from './modules/scheduler/handlers/trigger';
+import { handler as tickerSearch } from './modules/ticker/handlers/search';
+import { handler as tickerValidate } from './modules/ticker/handlers/validate';
+import { handler as insightsPortfolio } from './modules/insights/handlers/portfolioBuilder';
+import { handler as insightsRisk } from './modules/insights/handlers/riskSimulation';
+import { handler as insightsExit } from './modules/insights/handlers/exitGuide';
+import { handler as insightsRebalancing } from './modules/insights/handlers/rebalancing';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -146,6 +153,19 @@ app.post(
   '/executions/:ymCycle/confirm',
   wrapHandler(executionConfirm, (req) => ({ ymCycle: String(req.params.ymCycle) }))
 );
+
+// Scheduler
+app.post('/scheduler/trigger', wrapHandler(schedulerTrigger));
+
+// Ticker
+app.get('/tickers/search', wrapHandler(tickerSearch));
+app.post('/tickers/validate', wrapHandler(tickerValidate));
+
+// Insights
+app.post('/insights/portfolio-builder', wrapHandler(insightsPortfolio));
+app.post('/insights/risk-simulation', wrapHandler(insightsRisk));
+app.post('/insights/exit-guide', wrapHandler(insightsExit));
+app.post('/insights/rebalancing', wrapHandler(insightsRebalancing));
 
 // Health check
 app.get('/health', (_req, res) => {
