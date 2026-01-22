@@ -7,14 +7,13 @@ import { createResponder } from '../../../shared/response';
 import { requireAuth } from '../../../shared/middleware/requireAuth';
 import { logger } from '../../../shared/logger';
 import { processPlanForUser } from '../service';
-import { withSentry } from '../../../shared/sentry';
 
 interface TriggerRequest {
   dryRun?: boolean;
   force?: boolean; // Skip date check - always generate for next cycle
 }
 
-const rawHandler: APIGatewayProxyHandler = async (event) => {
+export const handler: APIGatewayProxyHandler = async (event) => {
   const { success, errors } = createResponder(event);
 
   try {
@@ -49,6 +48,3 @@ const rawHandler: APIGatewayProxyHandler = async (event) => {
     return errors.internal('Scheduler trigger failed');
   }
 };
-
-export const handler = withSentry(rawHandler);
-
