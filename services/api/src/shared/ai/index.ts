@@ -31,7 +31,8 @@ export async function getAIClient(): Promise<AIProvider> {
         apiKey = await getSecret(apiKeyArn);
       }
 
-      cachedProvider = new GeminiProvider(apiKey);
+      const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash-001';
+      cachedProvider = new GeminiProvider(apiKey, modelName);
       break;
     }
     default:
