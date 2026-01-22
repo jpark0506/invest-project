@@ -193,7 +193,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -217,7 +217,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -241,7 +241,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -265,7 +265,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -289,7 +289,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -313,7 +313,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -338,7 +338,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -362,7 +362,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -386,7 +386,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -411,7 +411,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -435,7 +435,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -460,7 +460,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -484,7 +484,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -509,7 +509,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -533,7 +533,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -557,7 +557,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -581,7 +581,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -608,7 +608,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -633,7 +633,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -659,7 +659,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -684,7 +684,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -709,7 +709,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -736,7 +736,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -763,7 +763,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -789,7 +789,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -815,7 +815,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
@@ -841,7 +841,7 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: es2022
         Sourcemap: false
         EntryPoints:
