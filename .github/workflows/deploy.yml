@@ -77,4 +77,5 @@ jobs:
               ApiUrl=${{ secrets.API_URL }} \
               KakaoClientId=${{ secrets.KAKAO_CLIENT_ID }} \
               KakaoClientSecret=${{ secrets.KAKAO_CLIENT_SECRET }} \
-              GeminiApiKeyArn=${{ secrets.GEMINI_API_KEY_ARN }}
+              GeminiApiKeyArn=${{ secrets.GEMINI_API_KEY_ARN }} \
+              SentryDsn=${{ secrets.SENTRY_DSN }}
