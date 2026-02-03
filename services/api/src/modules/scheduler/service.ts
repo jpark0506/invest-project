@@ -3,14 +3,15 @@
  */
 
 import { calculateExecution } from '@invest-assist/core';
+import type { Execution, ExecutionStatus, ExchangeRates } from '@invest-assist/core';
 import { logger } from '../../shared/logger';
 import * as planRepo from '../plan/repo';
 import * as portfolioRepo from '../portfolio/repo';
 import * as executionRepo from '../execution/repo';
 import { fetchPricesWithMarket } from './priceFetcher';
+import { getExchangeRates } from './exchangeRateFetcher';
 import { sendEmailNotification } from './notification';
 import type { RunSchedulerInput, RunSchedulerOutput, SchedulerError } from './types';
-import type { Execution, ExecutionStatus } from '@invest-assist/core';
 
 /** Result of processing a plan */
 export interface ProcessPlanResult {
@@ -141,16 +142,32 @@ export async function processPlanForUser(
       };
     }
 
+    // Fetch exchange rates for currency conversion
+    let exchangeRates: ExchangeRates;
+    try {
+      exchangeRates = await getExchangeRates();
+      logger.info('Exchange rates fetched for execution', { exchangeRates });
+    } catch (error) {
+      const rateError = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        status: 'error',
+        message: `환율 조회 실패: ${rateError}`,
+        error: { userId, planId: plan.planId, message: rateError },
+      };
+    }
+
     // Get carry-in from previous cycle
     const carryInByTicker = await getCarryIn(userId, yearMonth, cycleIndex);
 
-    // Calculate execution
+    // Calculate execution with exchange rates for currency conversion
     const calcResult = calculateExecution({
       monthlyBudget: plan.monthlyBudget,
       cycleWeight,
       holdings: portfolio.holdings,
       prices,
       carryInByTicker,
+      exchangeRates,
     });
 
     // Build execution record
@@ -167,6 +184,7 @@ export async function processPlanForUser(
       cycleBudget: calcResult.cycleBudget,
       items: calcResult.items,
       carryByTicker: calcResult.carryOutByTicker,
+      exchangeRates: calcResult.exchangeRates,
       signals: {
         overheatScore: 50,
         label: 'NEUTRAL',

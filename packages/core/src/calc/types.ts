@@ -12,6 +12,15 @@ export type MarketRegion = 'KR' | 'US';
 /** Currency types */
 export type Currency = 'KRW' | 'USD';
 
+/** Base currency for all calculations */
+export const BASE_CURRENCY: Currency = 'KRW';
+
+/**
+ * Exchange rates relative to base currency (KRW)
+ * Example: { KRW: 1, USD: 1350 } means 1 USD = 1350 KRW
+ */
+export type ExchangeRates = Record<Currency, number>;
+
 /** Market configuration */
 export interface MarketConfig {
   market: Market;
@@ -88,8 +97,9 @@ export interface CalculateExecutionInput {
   monthlyBudget: number; // KRW
   cycleWeight: number; // 0~1, weight for this cycle
   holdings: Holding[];
-  prices: Record<string, number>; // ticker -> price
-  carryInByTicker: Record<string, number>; // ticker -> carry amount
+  prices: Record<string, number>; // ticker -> price (in original currency)
+  carryInByTicker: Record<string, number>; // ticker -> carry amount (in KRW)
+  exchangeRates: ExchangeRates; // currency -> KRW rate (e.g., USD: 1350 means 1 USD = 1350 KRW)
   roundingPolicy?: RoundingPolicy;
 }
 
@@ -98,13 +108,15 @@ export interface ExecutionItem {
   ticker: string;
   name: string;
   market: Market;
-  price: number;
+  price: number; // Original price in market currency
+  priceCurrency: Currency; // Currency of the original price
+  priceInKRW: number; // Price converted to KRW
   targetWeight: number;
-  targetAmount: number;
-  carryIn: number;
+  targetAmount: number; // in KRW
+  carryIn: number; // in KRW
   shares: number;
-  estCost: number;
-  carryOut: number;
+  estCost: number; // in KRW
+  carryOut: number; // in KRW
 }
 
 /** Totals in execution result */
@@ -115,10 +127,11 @@ export interface ExecutionTotals {
 
 /** Output from execution calculation */
 export interface CalculateExecutionOutput {
-  cycleBudget: number;
+  cycleBudget: number; // in KRW
   items: ExecutionItem[];
-  carryOutByTicker: Record<string, number>;
-  totals: ExecutionTotals;
+  carryOutByTicker: Record<string, number>; // in KRW
+  totals: ExecutionTotals; // in KRW
+  exchangeRates: ExchangeRates; // rates used for this calculation
 }
 
 /** Validation error codes */

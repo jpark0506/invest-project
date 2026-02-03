@@ -94,11 +94,14 @@ async function fetchUSPrice(ticker: string): Promise<number> {
 export async function fetchPrice(ticker: string, market: Market): Promise<PriceData> {
   try {
     let price: number;
+    let currency: 'KRW' | 'USD';
 
     if (market === 'KRX' || market === 'KOSDAQ') {
       price = await fetchKoreanPrice(ticker);
+      currency = 'KRW';
     } else if (market === 'NYSE' || market === 'NASDAQ') {
       price = await fetchUSPrice(ticker);
+      currency = 'USD';
     } else {
       throw new Error(`Unsupported market: ${market}`);
     }
@@ -106,6 +109,7 @@ export async function fetchPrice(ticker: string, market: Market): Promise<PriceD
     return {
       ticker,
       price,
+      currency,
       source: market === 'KRX' || market === 'KOSDAQ' ? 'naver' : 'yahoo',
       fetchedAt: new Date().toISOString(),
     };

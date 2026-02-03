@@ -9,7 +9,14 @@ import {
   CalculateExecutionInput,
   ValidationError,
   Holding,
+  ExchangeRates,
 } from '../src/index';
+
+// Default exchange rates for tests (KRW base)
+const defaultExchangeRates: ExchangeRates = {
+  KRW: 1,
+  USD: 1350,
+};
 
 describe('calculateExecution', () => {
   // Sample holdings for tests
@@ -33,6 +40,7 @@ describe('calculateExecution', () => {
         holdings: sampleHoldings,
         prices: samplePrices,
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       const result = calculateExecution(input);
@@ -102,6 +110,7 @@ describe('calculateExecution', () => {
         holdings: expensiveHoldings,
         prices: { EXPENSIVE: 100000 }, // Price > cycleBudget * targetWeight
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       const result = calculateExecution(input);
@@ -128,6 +137,7 @@ describe('calculateExecution', () => {
         holdings,
         prices: { '069500': 35000 },
         carryInByTicker: { '069500': 20000 }, // Carry-in from previous cycle
+        exchangeRates: defaultExchangeRates,
       };
 
       const result = calculateExecution(input);
@@ -155,6 +165,7 @@ describe('calculateExecution', () => {
         holdings,
         prices: { '069500': 35000 },
         carryInByTicker: { '069500': 10000 },
+        exchangeRates: defaultExchangeRates,
       };
 
       const result = calculateExecution(input);
@@ -182,6 +193,7 @@ describe('calculateExecution', () => {
         holdings: invalidHoldings,
         prices: { '069500': 35000, '379800': 15000 },
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -201,6 +213,7 @@ describe('calculateExecution', () => {
         holdings: almostValidHoldings,
         prices: samplePrices,
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       // Should not throw - sum is 1.0000 within epsilon
@@ -216,6 +229,7 @@ describe('calculateExecution', () => {
         holdings: sampleHoldings,
         prices: { '069500': 35000 }, // Missing other prices
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -229,6 +243,7 @@ describe('calculateExecution', () => {
         holdings: sampleHoldings,
         prices: { ...samplePrices, '069500': 0 },
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -242,6 +257,7 @@ describe('calculateExecution', () => {
         holdings: sampleHoldings,
         prices: { ...samplePrices, '069500': -1000 },
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -256,6 +272,7 @@ describe('calculateExecution', () => {
         holdings: [],
         prices: {},
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -269,6 +286,7 @@ describe('calculateExecution', () => {
         holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -281,6 +299,7 @@ describe('calculateExecution', () => {
         holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
@@ -293,6 +312,7 @@ describe('calculateExecution', () => {
         holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: {},
+        exchangeRates: defaultExchangeRates,
       };
 
       const result = calculateExecution(input);
@@ -308,9 +328,114 @@ describe('calculateExecution', () => {
         holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
         prices: { TEST: 10000 },
         carryInByTicker: { TEST: -5000 },
+        exchangeRates: defaultExchangeRates,
       };
 
       expect(() => calculateExecution(input)).toThrow(ValidationError);
+    });
+  });
+
+  describe('Currency conversion', () => {
+    it('should convert USD prices to KRW for calculation', () => {
+      // US stock with USD price
+      const usHoldings: Holding[] = [
+        { ticker: 'AAPL', name: 'Apple Inc.', market: 'NASDAQ', targetWeight: 1.0 },
+      ];
+
+      const input: CalculateExecutionInput = {
+        monthlyBudget: 1350000, // 1,350,000 KRW
+        cycleWeight: 1.0,
+        holdings: usHoldings,
+        prices: { AAPL: 180 }, // $180 USD
+        carryInByTicker: {},
+        exchangeRates: { KRW: 1, USD: 1350 }, // 1 USD = 1350 KRW
+      };
+
+      const result = calculateExecution(input);
+
+      // priceInKRW = 180 * 1350 = 243,000 KRW
+      // shares = floor(1,350,000 / 243,000) = 5
+      // estCost = 5 * 243,000 = 1,215,000 KRW
+      // carryOut = 1,350,000 - 1,215,000 = 135,000 KRW
+      expect(result.items[0].price).toBe(180); // Original USD price
+      expect(result.items[0].priceCurrency).toBe('USD');
+      expect(result.items[0].priceInKRW).toBe(243000);
+      expect(result.items[0].shares).toBe(5);
+      expect(result.items[0].estCost).toBe(1215000);
+      expect(result.items[0].carryOut).toBe(135000);
+    });
+
+    it('should handle mixed KRW and USD holdings', () => {
+      const mixedHoldings: Holding[] = [
+        { ticker: '005930', name: '삼성전자', market: 'KRX', targetWeight: 0.5 },
+        { ticker: 'AAPL', name: 'Apple Inc.', market: 'NASDAQ', targetWeight: 0.5 },
+      ];
+
+      const input: CalculateExecutionInput = {
+        monthlyBudget: 2000000, // 2,000,000 KRW
+        cycleWeight: 1.0,
+        holdings: mixedHoldings,
+        prices: {
+          '005930': 70000, // 70,000 KRW
+          AAPL: 180, // $180 USD
+        },
+        carryInByTicker: {},
+        exchangeRates: { KRW: 1, USD: 1350 },
+      };
+
+      const result = calculateExecution(input);
+
+      // Samsung (KRW)
+      // targetAmount = 2,000,000 * 0.5 = 1,000,000 KRW
+      // shares = floor(1,000,000 / 70,000) = 14
+      // estCost = 14 * 70,000 = 980,000 KRW
+      const samsungItem = result.items.find((i) => i.ticker === '005930');
+      expect(samsungItem?.priceCurrency).toBe('KRW');
+      expect(samsungItem?.priceInKRW).toBe(70000);
+      expect(samsungItem?.shares).toBe(14);
+      expect(samsungItem?.estCost).toBe(980000);
+
+      // Apple (USD)
+      // targetAmount = 2,000,000 * 0.5 = 1,000,000 KRW
+      // priceInKRW = 180 * 1350 = 243,000 KRW
+      // shares = floor(1,000,000 / 243,000) = 4
+      // estCost = 4 * 243,000 = 972,000 KRW
+      const appleItem = result.items.find((i) => i.ticker === 'AAPL');
+      expect(appleItem?.priceCurrency).toBe('USD');
+      expect(appleItem?.price).toBe(180);
+      expect(appleItem?.priceInKRW).toBe(243000);
+      expect(appleItem?.shares).toBe(4);
+      expect(appleItem?.estCost).toBe(972000);
+
+      // Total should be in KRW
+      expect(result.totals.totalEstCost).toBe(980000 + 972000);
+    });
+
+    it('should include exchange rates in output', () => {
+      const input: CalculateExecutionInput = {
+        monthlyBudget: 1000000,
+        cycleWeight: 0.5,
+        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
+        prices: { TEST: 10000 },
+        carryInByTicker: {},
+        exchangeRates: { KRW: 1, USD: 1400 },
+      };
+
+      const result = calculateExecution(input);
+      expect(result.exchangeRates).toEqual({ KRW: 1, USD: 1400 });
+    });
+
+    it('should throw error for invalid exchange rates', () => {
+      const input: CalculateExecutionInput = {
+        monthlyBudget: 1000000,
+        cycleWeight: 0.5,
+        holdings: [{ ticker: 'TEST', name: 'Test', market: 'KRX', targetWeight: 1.0 }],
+        prices: { TEST: 10000 },
+        carryInByTicker: {},
+        exchangeRates: { KRW: 2, USD: 1350 }, // Invalid: KRW must be 1
+      };
+
+      expect(() => calculateExecution(input)).toThrow('KRW exchange rate must be 1');
     });
   });
 });

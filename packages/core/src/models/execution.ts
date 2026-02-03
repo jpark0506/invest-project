@@ -3,7 +3,7 @@
  * Based on schema.md specification
  */
 
-import { Market } from '../calc/types';
+import { Currency, ExchangeRates, Market } from '../calc/types';
 
 /** Execution status */
 export type ExecutionStatus = 'GENERATED' | 'SENT' | 'CONFIRMED';
@@ -16,13 +16,15 @@ export interface ExecutionItemRecord {
   ticker: string;
   name: string;
   market: Market;
-  price: number;
+  price: number; // Original price in market currency
+  priceCurrency: Currency; // Currency of the original price
+  priceInKRW: number; // Price converted to KRW
   targetWeight: number;
-  targetAmount: number;
-  carryIn: number;
+  targetAmount: number; // in KRW
+  carryIn: number; // in KRW
   shares: number;
-  estCost: number;
-  carryOut: number;
+  estCost: number; // in KRW
+  carryOut: number; // in KRW
 }
 
 /** Signal metrics */
@@ -56,10 +58,11 @@ export interface Execution {
   yearMonth: string; // '2026-02'
   cycleIndex: number; // 1, 2, or 3
   cycleWeight: number;
-  totalBudget: number;
-  cycleBudget: number;
+  totalBudget: number; // in KRW
+  cycleBudget: number; // in KRW
   items: ExecutionItemRecord[];
-  carryByTicker: Record<string, number>;
+  carryByTicker: Record<string, number>; // in KRW
+  exchangeRates?: ExchangeRates; // Exchange rates used for this execution
   signals: ExecutionSignals;
   aiComment: string | null;
   status: ExecutionStatus;

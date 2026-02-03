@@ -9,8 +9,12 @@ import {
   CalculateExecutionInput,
   CalculateExecutionOutput,
   ExecutionItem,
+  ExchangeRates,
+  Holding,
+  getMarketCurrency,
 } from './types';
 import { validateInputs } from './validators';
+import { normalizePriceToKRW, validateExchangeRates } from './currency';
 
 // Rounding policy can be used for future customization
 // const DEFAULT_ROUNDING_POLICY: RoundingPolicy = {
@@ -29,15 +33,16 @@ export function calculateExecution(input: CalculateExecutionInput): CalculateExe
   // Validate all inputs first
   validateInputs(input);
 
-  const { monthlyBudget, cycleWeight, holdings, prices, carryInByTicker } = input;
-  // Rounding policy can be used for future customization
-  // const _roundingPolicy = input.roundingPolicy ?? DEFAULT_ROUNDING_POLICY;
+  const { monthlyBudget, cycleWeight, holdings, prices, carryInByTicker, exchangeRates } = input;
 
-  // Step 1: Calculate cycle budget
+  // Validate exchange rates
+  validateExchangeRates(exchangeRates);
+
+  // Step 1: Calculate cycle budget (in KRW)
   const cycleBudget = computeCycleBudget(monthlyBudget, cycleWeight);
 
-  // Step 2: Calculate items for each holding
-  const items = computeItems(holdings, cycleBudget, prices, carryInByTicker);
+  // Step 2: Calculate items for each holding (with currency conversion)
+  const items = computeItems(holdings, cycleBudget, prices, carryInByTicker, exchangeRates);
 
   // Step 3: Build carry-out map
   const carryOutByTicker = buildCarryOutMap(items);
@@ -50,6 +55,7 @@ export function calculateExecution(input: CalculateExecutionInput): CalculateExe
     items,
     carryOutByTicker,
     totals,
+    exchangeRates,
   };
 }
 
@@ -62,38 +68,46 @@ function computeCycleBudget(monthlyBudget: number, cycleWeight: number): number 
 
 /**
  * Calculate execution items for all holdings
+ * All monetary values are normalized to KRW for consistent calculation
  */
 function computeItems(
-  holdings: CalculateExecutionInput['holdings'],
+  holdings: Holding[],
   cycleBudget: number,
   prices: Record<string, number>,
-  carryInByTicker: Record<string, number>
+  carryInByTicker: Record<string, number>,
+  exchangeRates: ExchangeRates
 ): ExecutionItem[] {
   return holdings.map((holding) => {
     const { ticker, name, market, targetWeight } = holding;
-    const price = prices[ticker];
-    const carryIn = carryInByTicker[ticker] ?? 0;
+    const price = prices[ticker]; // Price in original currency
+    const priceCurrency = getMarketCurrency(market);
+    const carryIn = carryInByTicker[ticker] ?? 0; // Already in KRW
 
-    // Target amount for this holding in this cycle
+    // Convert price to KRW for calculation
+    const priceInKRW = normalizePriceToKRW(price, market, exchangeRates);
+
+    // Target amount for this holding in this cycle (in KRW)
     const targetAmount = cycleBudget * targetWeight;
 
-    // Budget available including carry-in
+    // Budget available including carry-in (in KRW)
     const budgetForTicker = targetAmount + carryIn;
 
-    // Calculate shares (floor)
-    const shares = Math.floor(budgetForTicker / price);
+    // Calculate shares using KRW-normalized price
+    const shares = Math.floor(budgetForTicker / priceInKRW);
 
-    // Estimated cost
-    const estCost = shares * price;
+    // Estimated cost in KRW
+    const estCost = shares * priceInKRW;
 
-    // Carry-out for next cycle
+    // Carry-out for next cycle (in KRW)
     const carryOut = budgetForTicker - estCost;
 
     return {
       ticker,
       name,
       market,
-      price,
+      price, // Original price in market currency
+      priceCurrency,
+      priceInKRW,
       targetWeight,
       targetAmount,
       carryIn,
