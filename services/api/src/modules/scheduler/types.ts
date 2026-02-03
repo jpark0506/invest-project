@@ -22,6 +22,7 @@ export interface SchedulerError {
 export interface PriceData {
   ticker: string;
   price: number;
+  currency: 'KRW' | 'USD'; // Currency of the price
   source: string;
   fetchedAt: string;
 }
