@@ -30,6 +30,13 @@ function ExecutionContent({ ymCycle }: { ymCycle: string }) {
     }
   };
 
+  const formatPrice = (price: number, currency?: string) => {
+    if (currency === 'USD') {
+      return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `${price.toLocaleString()}원`;
+  };
+
   const handleConfirm = async () => {
     if (!decodedYmCycle) return;
 
@@ -127,11 +134,11 @@ function ExecutionContent({ ymCycle }: { ymCycle: string }) {
                   <div className="text-xs text-text-tertiary">{item.ticker}</div>
                 </td>
                 <td className="text-right py-3 px-2">
-                  {item.price.toLocaleString()}
+                  {formatPrice(item.price, item.priceCurrency)}
                 </td>
                 <td className="text-right py-3 px-2 font-medium">{item.shares}</td>
                 <td className="text-right py-3 px-2">
-                  {item.estCost.toLocaleString()}
+                  {item.estCost.toLocaleString()}원
                 </td>
               </tr>
             ))}
